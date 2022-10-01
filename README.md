@@ -7,7 +7,7 @@ First download Processing and run the ClickStackGenerator sketch.  Fiddle with t
 
 Template: If you want a template during the build process, press 'p' in the processing sketch to export a PNG of your design which you can then print. Measure your printout to ensure the scale is correct.  If not, change 'sF' in the sketch to modify the scale factor up or down.
 
-Make the wodden parts and plastic panels:
+Make the wooden parts and plastic panels:
 
 CNC Method:
 
@@ -32,7 +32,7 @@ For the plastic, scissors or shears work fine.
 
 Wiring:
 
-Wire up the bubttons to either some protoboard or get the official button pcb at https://oshpark.com/shared_projects/baTaN6WL
+Wire up the buttons to either some protoboard or get the official button pcb at https://oshpark.com/shared_projects/baTaN6WL
 Using the pcb is a better option because you can avoid needing screws to hold it in place since it's a perfect fit.  You can achieve the same thing with protoboard if you take the time to dial it in.  Make your connections to the microcontroller.
 
 Add foam:
@@ -49,7 +49,7 @@ Software:
 
 First of all, there are a few options for how the ClickStack actually interfaces with a computer:
 
-A) The simplest is to use something like an arduino nano and the default arduino Mouse library, with a usb cable providing both power and data connection.  In the ClickStackGenerator sketch, an Elegoo Arduino Nano is used for the mcu pocket size and usb jack location. 
+A) The simplest is to use something like an Arduino Nano and the default Arduino Mouse library, with a usb cable providing both power and data connection.  In the ClickStackGenerator sketch, an Elegoo Arduino Nano is used for the mcu pocket size and usb jack location. 
 
 B) An ESP32 or other mcu with built-in Bluetooth, using a usb cable for power only.  This can be powered via the computer's port if you want, but can also plug into a wall outlet via a 5V block.  This is helpful since the ClickStack sits on the ground where reaching the computer with a cable might be a hassle.  It also frees up a port.
 
