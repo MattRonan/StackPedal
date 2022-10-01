@@ -30,6 +30,11 @@ Now you'll need a dremel.  A trick for getting accurate depths by hand is to sna
 For the plastic, scissors or shears work fine.  
 
 
+Both methods, drill wire holes for higher level buttons:
+
+Any button at level 0 gets its tracks to the mcu fully routed.  Buttons at level 1 or higher require hand drilling diagonally down to connect the
+button track to the track routed in the base.  Typically a 1/8 bit works well for this for most wires.
+
 Wiring:
 
 Wire up the buttons to either some protoboard or get the official button pcb at https://oshpark.com/shared_projects/baTaN6WL
