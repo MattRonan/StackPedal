@@ -9,7 +9,7 @@ B) An ESP32 or other mcu with built-in Bluetooth, using a usb cable for power on
 
 C)  ESP32 or other mcu with built-in Bluetooth, using a battery pack (rechargeable or not).  This is a fully wireless solution but requires changing the code to make the mcu go to sleep when not transmitting, otherwise it will be constantly needing charging or new batteries.  A great writeup on ESP32 deep sleep can be found here https://lastminuteengineers.com/esp32-deep-sleep-wakeup-sources/ It seems that in order to use multiple GPIO pins to wake up the mcu, a button press needs to be logic HIGH, which is the reverse of the code I have in the current included Arduino sketch.  ESP32 supports INPUT_PULLDOWN when setting pinMode so you can do whatever you need to do in software.
 
-T-vK made a great BLE mouse library for the ESP32 which can be found at https://github.com/T-vK/ESP32-BLE-Mouse 
+For options B and C, T-vK made a great BLE mouse library for the ESP32 which can be found at https://github.com/T-vK/ESP32-BLE-Mouse 
 
 
 
