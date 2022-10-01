@@ -5,7 +5,9 @@
    A program to generate gcode and a printable template
    For a custom ClickStack build.
   
-   *be sure to set the values in the 'USER VALUES' box below*
+   *Be sure to set the values in the 'USER VALUES' box below*
+   
+   *ALL DIMENSIONS ARE IN MM*
 */
 
 import java.awt.*;
@@ -15,18 +17,29 @@ import processing.serial.*;
 
 //-----------------------~~!!!! USER VALUES !!!!
 float toolR = 1.5; //measure your bit, divide by 2.
-int highSpeed = 650;
+int highSpeed = 650; //set these speeds to what your machine needs.
 int normalSpeed = 450;
 int lowSpeed = 200;
 int plungeSpeed = 50;
 
 float sF = 5; //scale factor.  This is important if you want to export a png to use as a printed template. on a 1600x900 Dell E7470, 5 created a very accruate template. 
 
-//END IMPORTANT------------------------------------------------------------
+int stockT = 12;  //the thickness of your board.  Determines the thickness of each level.
+int baseHeight = 125; //this the dimension of the base measured parallel to the pedals. ie this minus pedalL is how much space is left for the microcontroller area.
 
+float mcuW = 17.5; //change to the width/length/height of your microcontroller.  This is an Elegoo Arduino Nano
+float mcuL = 43;
+float mcuH = 7.5; //total height of board.  This determines how deep the mcu pocket will be.
+float mcuUSBW = 7.5; //width of usb jack.  Determines width of opening in plactic side panel.
+float mcuUSBH = 3.75; //height of usb jack.  Determines how tall the opening is in the plastic side panel.
+float mcuUSBHeightOffset = 0;// on some boards such as ESP32, the usb jack might not be the highest point.  This is how much lower the usb jack is than the highest point.  (highest point in those cases is usually a PH connector)
+int mcuJackWall = 0;  //Which wall does the jack come out of.  0 = left side, 1 = back side, 2 = right side 
+float mcuJackPos = .5; //shift the location of the jack by inputting a value from 0-1.  .5 puts it in the middle of that wall.
+float mcuConnectionClearanceSize = 5; //open up some space around mcu to help wires fit in easier.  this is how far it extends out from the pins. 
+float clearanceFactor = .75;//Percent of material to remove along mcu pocket sides.  greater than .75 is going to risk the mcu not being held in place as sungly.
+//------------------------------------------------------------
 
-int stockT = 12;  //the thickness of your board.
-int baseHeight = 125; //this the dimension of the base measured parallel to the pedals. ie this minus pedalL is how much space is left for the microcontroller.
+float actuatorPosOffset = 1.5;  //button on official pcbs is not directly in the center, so this offset accounts for that.
 
 ClickStack clickStack = new ClickStack(stockT,baseHeight);
 
@@ -166,18 +179,49 @@ class ClickStack{
        
        //ledges
        stroke(0,200,255);
-       line((buttons[i].x*sF) + this.origin[0], ((buttons[i].y+buttons[i].pedalLedgeW)*sF) + this.origin[0] , ((buttons[i].x+buttons[i].pedalW)*sF)+ this.origin[0], ((buttons[i].y+buttons[i].pedalLedgeW)*sF) + this.origin[0]);
+       line((buttons[i].x*sF) + this.origin[0], ((buttons[i].y+buttons[i].pedalLedgeW)*sF) + this.origin[1] , ((buttons[i].x+buttons[i].pedalW)*sF)+ this.origin[0], ((buttons[i].y+buttons[i].pedalLedgeW)*sF) + this.origin[1]);
        
        //button PCB pockets
        stroke(102,250,55);
-       rect( ((buttons[i].buttonPCBTL[0]+buttons[i].x)*sF)+this.origin[0],  ((buttons[i].buttonPCBTL[1]+buttons[i].y)*sF)+this.origin[1],  buttonPCBDimension[0]*sF,  buttonPCBDimension[1]*sF  );
+       rect( ((buttons[i].buttonPCBTL[0]+buttons[i].x)*sF)+this.origin[0],  ((buttons[i].buttonPCBTL[1]+buttons[i].y-actuatorPosOffset)*sF)+this.origin[1],  buttonPCBDimension[0]*sF,  buttonPCBDimension[1]*sF  );
        
        //wire tracks
-       line(((buttons[i].x+(buttons[i].pedalW/2))*sF) + this.origin[0],((buttons[i].y+buttons[i].buttonActuatorY)*sF)+this.origin[1],6,6);
+       line(((buttons[i].x+(buttons[i].pedalW/2))*sF) + this.origin[0],((buttons[i].y+buttons[i].buttonActuatorY)*sF)+this.origin[1],((buttons[i].x+(buttons[i].pedalW/2))*sF) + this.origin[0],((buttons[i].y+buttons[i].pedalLedgeW)*sF) + this.origin[1]);//first line reaches ledge.
+       
+       if(buttons[i].level == 0){
+         line(((buttons[i].x+(buttons[i].pedalW/2))*sF) + this.origin[0], ((buttons[i].y+buttons[i].pedalLedgeW)*sF) + this.origin[1], ((buttons[i].x+(buttons[i].pedalW/2))*sF) + this.origin[0], ((buttons[i].y)*sF) + this.origin[1]);//base level buttons carve thru the ledge.
+       }
+       
+       
+       //mcu pocket
+       stroke(252,250,0);
+       switch(mcuJackWall){
+         case 0: rect(0+this.origin[0],  (((baseHeight-ClickStack.this.defaultPedalL)*mcuJackPos-(mcuW/2))*sF)+this.origin[1],  mcuL*sF,  mcuW*sF  ); //mcu pocket
+                 rect(0+this.origin[0]+((mcuL-(mcuL*clearanceFactor))/2*sF),  (((baseHeight-ClickStack.this.defaultPedalL)*mcuJackPos-(mcuW/2) - mcuConnectionClearanceSize )*sF)+this.origin[1],  (mcuL*clearanceFactor)*sF,  (mcuW+(mcuConnectionClearanceSize*2))*sF  ); //extra relief for wires
+                 //mcuConnectionClearanceSize
+                 break;
+         case 1: 
+                 break;
+         case 2:
+                 break;
+     
+       }
+       /*
+       float mcuW = 17.5; //change to the width/length/height of your microcontroller.  This is an Elegoo Arduino Nano
+      float mcuL = 43;
+      float mcuH = 7.5; //total height of board.  This determines how deep the mcu pocket will be.
+      float mcuUSBW = 7.5; //width of usb jack.  Determines width of opening in plactic side panel.
+      float mcuUSBH = 3.75; //height of usb jack.  Determines how tall the opening is in the plastic side panel.
+      float mcuUSBHeightOffset = 0;// on some boards such as ESP32, the usb jack might not be the highest point.  This is how much lower the usb jack is than the highest point.  (highest point in those cases is usually a PH connector)
+      int mcuJackWall = 0;  //Which wall does the jack come out of.  0 = left side, 1 = back side, 2 = right side 
+      float mcuJackPos = .5;*/
        
        //actuator locations
        stroke(250,0,55);
        circle(((buttons[i].x+(buttons[i].pedalW/2))*sF) + this.origin[0],((buttons[i].y+buttons[i].buttonActuatorY)*sF)+this.origin[1],6);
+     
+       
+
      
        //draw info
        text("Level = " + buttons[i].level, ((buttons[i].buttonPCBTL[0]+buttons[i].x)*sF)+this.origin[0],  ((buttons[i].buttonPCBTL[1]+buttons[i].y+ buttonPCBDimension[1]+3)*sF)+this.origin[1]);
@@ -227,7 +271,7 @@ class ClickStack{
       this.pedalLedgeW =  ClickStack.this.defaultPedalLedgeW;
       this.buttonReliefDepth =  ClickStack.this.defaultButtonReliefDepth;
       this.otherReliefDepth =  ClickStack.this.defaultOtherReliefDepth;
-      this.buttonActuatorY = ((this.pedalL-this.pedalLedgeW)/2) + (this.pedalLedgeW/2);//the y positionn of the actual clicky button plunger
+      this.buttonActuatorY = ((this.pedalL-this.pedalLedgeW)/2) + (this.pedalLedgeW);//the y positionn of the actual clicky button plunger
       this.level = level;
       this.recalculate();
     }
