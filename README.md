@@ -5,7 +5,7 @@ Build Instructions:
 
 First download Processing and run the ClickStackGenerator sketch.  Fiddle with the parameters to get the layout you want.  For most cases you probably just want to change the amount of buttons added in setup via addButton and their width using setButtonWidth.  There are a couple common layouts included which you can uncomment to use.
 
-Template: If you want a template, press 'p' in the processing sketch to export a PNG of your design which you can then print. Measure your printout to ensure the scale is correct.  If not, change 'sF' in the sketch to modify the scale factor up or down.
+Template: If you want a template during the build process, press 'p' in the processing sketch to export a PNG of your design which you can then print. Measure your printout to ensure the scale is correct.  If not, change 'sF' in the sketch to modify the scale factor up or down.
 
 Make the wodden parts and plastic panels:
 
