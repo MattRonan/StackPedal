@@ -36,9 +36,8 @@ float sF = 5; //scale factor.  This is important if you want to export a png to 
 float stockT = 12;  //the thickness of your board.  Determines the thickness of each level.
 float stockW = 140; //the width of your board.  This is important for the calculation of layout of the stacks in job1
 float plasticT = 1.5; //thickness of the plastic.  Used for the electronics cover and the presser panels.
+
 float baseHeight = 125; //this the dimension of the base measured parallel to the pedals. ie this minus pedalL is how much space is left for the microcontroller area.
-
-
 float mcuW = 17.5; //change to the width/length/height of your microcontroller.  This is an Elegoo Arduino Nano
 float mcuL = 43;
 float mcuH = 7.5; //total height of board.  This determines how deep the mcu pocket will be.
@@ -56,7 +55,7 @@ float topCoverScrewClearance = 4;
 float buttonReliefDepth = 8; //section where button+PCB sits.  with a 5mm button and the 1.6mm board+solder joints, there should be .5mm to 1mm of clearance for the button
 float otherReliefDepth = 5; //where the button isnt, remove enough material so that the plastic presser panels dont get blocked by wood when pressed.
 float wireTrackDepth = 3;
-float ledgeClearance = 6;
+float ledgeClearance = 6; //distance out from top side of pedal to carve straight before heading to mcu
 
 //------------------------------------------------------------
 
