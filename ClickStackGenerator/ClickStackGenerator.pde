@@ -34,6 +34,7 @@ float defaultTabT = 2;
 float sF = 5; //scale factor.  This is important if you want to export a png to use as a printed template. on a 1600x900 Dell E7470, 5 created a very accruate template. 
 
 float stockT = 12;  //the thickness of your board.  Determines the thickness of each level.
+float stockW = 140; //the width of your board.  This is important for the calculation of layout of the stacks in job1
 float plasticT = 1.5; //thickness of the plastic.  Used for the electronics cover and the presser panels.
 float baseHeight = 125; //this the dimension of the base measured parallel to the pedals. ie this minus pedalL is how much space is left for the microcontroller area.
 
@@ -89,7 +90,7 @@ void setup() {
   
   
   //big center button layout
-  /*
+  
   clickStack.addButton(2); //add buttons from left to right, specifying their level. For level 0 relief gets carved into base board, 1 or higher gets cut as a separate piece to be glued on.
   clickStack.addButton(1); //the buttons ID depends on the order you add them
   clickStack.addButton(0);
@@ -99,12 +100,13 @@ void setup() {
   clickStack.setButtonWidth(1,45);//use button ID followed by value
   clickStack.setButtonWidth(2,120);//use button ID followed by value
   clickStack.setButtonWidth(3,45);//use button ID followed by value
-  clickStack.setButtonWidth(4,25);//use button ID followed by value*/
+  clickStack.setButtonWidth(4,25);//use button ID followed by value
   
   //classic 3-stack
+  /*
   clickStack.addButton(2); //add buttons from left to right, specifying their level. For level 0 relief gets carved into base board, 1 or higher gets cut as a separate piece to be glued on.
   clickStack.addButton(1); //the buttons ID depends on the order you add them
-  clickStack.addButton(0);
+  clickStack.addButton(0);*/
   
 }
 
@@ -176,7 +178,7 @@ class ClickStack{
   float[] mcuCenter = {0,0};
   float[] mcuTL = {0,0};
   
-  PedalButton[] buttons = new PedalButton[5]; 
+  PedalButton[] buttons = new PedalButton[20]; 
   
   public ClickStack(float stockT, float baseHeight){
      this.stockT = stockT;
@@ -428,7 +430,7 @@ void exportGCode(){
   int corner = 0;
   int cent = 1;
   
-  //job 0 is the base
+  //-------------------------------------------------------------Job 0 , base
   header();
     
    F.plus("F"+highSpeed);
@@ -466,79 +468,79 @@ void exportGCode(){
      F.plus("G00 F" + normalSpeed);
      
      //usb recess
-       switch(mcuJackWall){
-           case 0:         
-                   lineOptimized(0+0,  (clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)  +0,  0+0,  ((clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)+0,0,(mcuH+3)*-1,normalStep);
-                   break;
-           case 1:             
-                   lineOptimized((clickStack.mcuTL[0]-(usbPanelL-mcuW)/2)  + 0,  0+0, ((clickStack.mcuTL[0]-(usbPanelL-mcuW)/2)+usbPanelL)+0,  0+0,0,(mcuH+3)*-1,normalStep);
-                   break;
-           case 2:  
-                   lineOptimized(clickStack.baseWidth+0,  (clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)  + 0,  clickStack.baseWidth+0,  ((clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)+0,0,(mcuH+3)*-1,normalStep);
-                   break;
-         }
+     switch(mcuJackWall){
+         case 0:         
+                 lineOptimized(0+0,  (clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)  +0,  0+0,  ((clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)+0,0,(mcuH+3)*-1,normalStep);
+                 break;
+         case 1:             
+                 lineOptimized((clickStack.mcuTL[0]-(usbPanelL-mcuW)/2)  + 0,  0+0, ((clickStack.mcuTL[0]-(usbPanelL-mcuW)/2)+usbPanelL)+0,  0+0,0,(mcuH+3)*-1,normalStep);
+                 break;
+         case 2:  
+                 lineOptimized(clickStack.baseWidth+0,  (clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)  + 0,  clickStack.baseWidth+0,  ((clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)+0,0,(mcuH+3)*-1,normalStep);
+                 break;
+       }
+   
+   
+   F.plus("G01 Z2");
+   F.plus("G00 F" + normalSpeed);
+   
+   //level 0 button related
+   for(int i = 0; i < clickStack.numButtons; i++){
+   
+     if(clickStack.buttons[i].level == 0){ //any level 0 buttons end up in job0 where we cut the base.  Other ones get put into job1
      
-     
-     F.plus("G01 Z2");
-     F.plus("G00 F" + normalSpeed);
-     
-     //level 0 button related
-     for(int i = 0; i < clickStack.numButtons; i++){
-     
-       if(clickStack.buttons[i].level == 0){ //any level 0 buttons end up in job0 where we cut the base.  Other ones get put into job1
+       //general relief to leave a ledge
+       for(float z = 0; z >= otherReliefDepth*-1; z -= normalStep){
+         rectangularFace((clickStack.buttons[i].x) + 0, ((clickStack.buttons[i].y+clickStack.buttons[i].pedalLedgeW)) + 0 , clickStack.buttons[i].pedalW,clickStack.buttons[i].pedalL -clickStack.buttons[i].pedalLedgeW,in,corner,z,toolR,2 );
+       }
        
-         //general relief to leave a ledge
-         for(float z = 0; z >= otherReliefDepth*-1; z -= normalStep){
-           rectangularFace((clickStack.buttons[i].x) + 0, ((clickStack.buttons[i].y+clickStack.buttons[i].pedalLedgeW)) + 0 , clickStack.buttons[i].pedalW,clickStack.buttons[i].pedalL -clickStack.buttons[i].pedalLedgeW,in,corner,z,toolR,2 );
-         }
-         
-         tabSize = 0;
-         F.plus("G01 Z2");
-         F.plus("G00 F" + normalSpeed);
-         
-         //foam slot
-         for(float z = otherReliefDepth*-1; z >= (otherReliefDepth+4)*-1; z -= normalStep){
-           rectangularFace( ((clickStack.buttons[i].foamSlotTL[0]+clickStack.buttons[i].x))+0,  ((clickStack.buttons[i].foamSlotTL[1]+clickStack.buttons[i].y))+0-toolR,  clickStack.buttons[i].foamSlotWidth,  clickStack.buttons[i].foamThickness,in,corner,z,toolR,2  );
-         }
-         
-         F.plus("G01 Z2");
-         F.plus("G00 F" + normalSpeed);
-          
-         //pcb holder
-         for(float z = otherReliefDepth*-1; z >= buttonReliefDepth*-1; z -= normalStep){
-           rectangularFace( ((clickStack.buttons[i].buttonPCBTL[0]+clickStack.buttons[i].x))+0,  ((clickStack.buttons[i].buttonPCBTL[1]+clickStack.buttons[i].y-actuatorPosOffset))+0,  buttonPCBDimension[0],  buttonPCBDimension[1],in,corner,z,toolR,2  );
-         }
-         
-         F.plus("G01 Z2");
-         F.plus("G00 F" + normalSpeed);
-         
-         //wire track in button are
-         lineOptimized(((clickStack.buttons[i].x+(clickStack.buttons[i].pedalW/2))) + 0,((clickStack.buttons[i].y+clickStack.buttons[i].buttonActuatorY))+0,((clickStack.buttons[i].x+(clickStack.buttons[i].pedalW/2))) + 0,((clickStack.buttons[i].y+clickStack.buttons[i].pedalLedgeW))+toolR + 0,otherReliefDepth*-1,(otherReliefDepth+wireTrackDepth)*-1,normalStep);//first line reaches ledge.
-         
-         //carve thru ledge
-         lineOptimized(((clickStack.buttons[i].x+(clickStack.buttons[i].pedalW/2))) + 0, ((clickStack.buttons[i].y+clickStack.buttons[i].pedalLedgeW)) + 0+toolR, ((clickStack.buttons[i].x+(clickStack.buttons[i].pedalW/2))) + 0, ((clickStack.buttons[i].y)) + 0 + toolR,0,(otherReliefDepth+wireTrackDepth)*-1,normalStep);//base level buttons carve thru the ledge.
-         
-         //screw locations 
-         F.plus("G01 Z2");
-         F.plus("G00 F" + normalSpeed);
-         drillHole((clickStack.buttons[i].x+pedalScrewClearance)+0,(clickStack.buttons[i].y+clickStack.buttons[i].pedalLedgeW/2)+0,-.5);
-         drillHole((clickStack.buttons[i].x+clickStack.buttons[i].pedalW-pedalScrewClearance)+0,(clickStack.buttons[i].y+clickStack.buttons[i].pedalLedgeW/2)+0,-.5);
-         }
-         
-         //carve tracks into base to mcu pocket
-         lineOptimized(((clickStack.buttons[i].x+(clickStack.buttons[i].pedalW/2))) + 0, ((clickStack.buttons[i].y)) + 0 + toolR,((clickStack.buttons[i].x+(clickStack.buttons[i].pedalW/2))) + 0,((clickStack.buttons[i].y-ledgeClearance)) + 0 + toolR,0,(otherReliefDepth+wireTrackDepth)*-1,normalStep);//carve straight out from edge of button before heading to mcu
-         
-         lineOptimized(((clickStack.buttons[i].x+(clickStack.buttons[i].pedalW/2))) + 0,((clickStack.buttons[i].y-ledgeClearance)) + 0 + toolR,clickStack.mcuCenter[0],clickStack.mcuCenter[1],0,(wireTrackDepth)*-1,normalStep);//now carve to mcu pocket 
-         
-     }//end button loop
-     
-     //outline base
-     tabSize = 0; 
-     for(float z = 0; z >= stockT*-1; z -= normalStep){
-       if(z <= (stockT-defaultTabT) *-1){ tabSize = 20;}
-       cutRectangle(0,0,clickStack.baseWidth,clickStack.baseHeight,out,corner,z,toolR,tabSize,2); 
-     }
-     tabSize = 0;
+       tabSize = 0;
+       F.plus("G01 Z2");
+       F.plus("G00 F" + normalSpeed);
+       
+       //foam slot
+       for(float z = otherReliefDepth*-1; z >= (otherReliefDepth+4)*-1; z -= normalStep){
+         rectangularFace( ((clickStack.buttons[i].foamSlotTL[0]+clickStack.buttons[i].x))+0,  ((clickStack.buttons[i].foamSlotTL[1]+clickStack.buttons[i].y))+0-toolR,  clickStack.buttons[i].foamSlotWidth,  clickStack.buttons[i].foamThickness,in,corner,z,toolR,2  );
+       }
+       
+       F.plus("G01 Z2");
+       F.plus("G00 F" + normalSpeed);
+        
+       //pcb holder
+       for(float z = otherReliefDepth*-1; z >= buttonReliefDepth*-1; z -= normalStep){
+         rectangularFace( ((clickStack.buttons[i].buttonPCBTL[0]+clickStack.buttons[i].x))+0,  ((clickStack.buttons[i].buttonPCBTL[1]+clickStack.buttons[i].y-actuatorPosOffset))+0,  buttonPCBDimension[0],  buttonPCBDimension[1],in,corner,z,toolR,2  );
+       }
+       
+       F.plus("G01 Z2");
+       F.plus("G00 F" + normalSpeed);
+       
+       //wire track in button are
+       lineOptimized(((clickStack.buttons[i].x+(clickStack.buttons[i].pedalW/2))) + 0,((clickStack.buttons[i].y+clickStack.buttons[i].buttonActuatorY))+0,((clickStack.buttons[i].x+(clickStack.buttons[i].pedalW/2))) + 0,((clickStack.buttons[i].y+clickStack.buttons[i].pedalLedgeW))+toolR + 0,otherReliefDepth*-1,(otherReliefDepth+wireTrackDepth)*-1,normalStep);//first line reaches ledge.
+       
+       //carve thru ledge
+       lineOptimized(((clickStack.buttons[i].x+(clickStack.buttons[i].pedalW/2))) + 0, ((clickStack.buttons[i].y+clickStack.buttons[i].pedalLedgeW)) + 0+toolR, ((clickStack.buttons[i].x+(clickStack.buttons[i].pedalW/2))) + 0, ((clickStack.buttons[i].y)) + 0 + toolR,0,(otherReliefDepth+wireTrackDepth)*-1,normalStep);//base level buttons carve thru the ledge.
+       
+       //screw locations 
+       F.plus("G01 Z2");
+       F.plus("G00 F" + normalSpeed);
+       drillHole((clickStack.buttons[i].x+pedalScrewClearance)+0,(clickStack.buttons[i].y+clickStack.buttons[i].pedalLedgeW/2)+0,-.5);
+       drillHole((clickStack.buttons[i].x+clickStack.buttons[i].pedalW-pedalScrewClearance)+0,(clickStack.buttons[i].y+clickStack.buttons[i].pedalLedgeW/2)+0,-.5);
+       }
+       
+       //carve tracks into base to mcu pocket
+       lineOptimized(((clickStack.buttons[i].x+(clickStack.buttons[i].pedalW/2))) + 0, ((clickStack.buttons[i].y)) + 0 + toolR,((clickStack.buttons[i].x+(clickStack.buttons[i].pedalW/2))) + 0,((clickStack.buttons[i].y-ledgeClearance)) + 0 + toolR,0,(otherReliefDepth+wireTrackDepth)*-1,normalStep);//carve straight out from edge of button before heading to mcu
+       
+       lineOptimized(((clickStack.buttons[i].x+(clickStack.buttons[i].pedalW/2))) + 0,((clickStack.buttons[i].y-ledgeClearance)) + 0 + toolR,clickStack.mcuCenter[0],clickStack.mcuCenter[1],0,(wireTrackDepth)*-1,normalStep);//now carve to mcu pocket 
+       
+   }//end button loop
+   
+   //outline base
+   tabSize = 0; 
+   for(float z = 0; z >= stockT*-1; z -= normalStep){
+     if(z <= (stockT-defaultTabT) *-1){ tabSize = 20;}
+     cutRectangle(0,0,clickStack.baseWidth,clickStack.baseHeight,out,corner,z,toolR,tabSize,2); 
+   }
+   tabSize = 0;
      
  
   footer();
@@ -548,18 +550,125 @@ void exportGCode(){
 
   job++;
   
-  //-------------------------job1, higher level button stacks
+  //-------------------------------------------------------------------------JOB 1 higher level button stacks
   
-  //button stack outline
-         
-         //this doesnt happen on level 0 buttons
-         /*
+  //this job are flipped 90degrees, because generally it looks nicer if the grain follows the long dimension, but 
+  
+  header();
+  
+  //button stack outlines.    
+  float xOff = 0;
+  float yOff = 0;
+  float yLimit = stockW-15; 
+  float yClearance = 15;
+  float xClearance = 20;
+  
+  for(int i = 0; i < clickStack.numButtons; i++){
+    
+    if(clickStack.buttons[i].level != 0){
+      
+      if(yOff+clickStack.buttons[i].pedalW > yLimit){ 
+        yOff = 0;
+        xOff += clickStack.buttons[i].pedalL+xClearance; //thisll be more complicated if you want variable length pedals, so for now best to keep them all the same length.  IDK why you'd want different lengths anyway.
+      }
+      
+      tabSize = 0;
+      for(float z = 0; z >= stockT*-1; z -= normalStep){
+        if(z <= (stockT-1) *-1){ tabSize = 10;}
+        cutRectangle(xOff,yOff,clickStack.buttons[i].pedalL,clickStack.buttons[i].pedalW,out,corner,z,toolR,tabSize,2);
+      }
+      
+      tabSize = 0;
+      
+      F.plus("F"+normalSpeed);
+      F.plus("G01 Z02");
+      
+      
+      //general relief to leave a ledge
+       for(float z = 0; z >= otherReliefDepth*-1; z -= normalStep){
+         rectangularFace((xOff+clickStack.buttons[i].pedalLedgeW) + 0, (yOff) + 0 , clickStack.buttons[i].pedalL -clickStack.buttons[i].pedalLedgeW,clickStack.buttons[i].pedalW,in,corner,z,toolR,2 );
+       }
+       
+       F.plus("G01 Z2");
+       F.plus("G00 F" + normalSpeed);
+       
+       //foam slot
+       for(float z = otherReliefDepth*-1; z >= (otherReliefDepth+4)*-1; z -= normalStep){
+         rectangularFace( clickStack.buttons[i].foamSlotTL[1]+0-toolR +xOff,  clickStack.buttons[i].foamSlotTL[0]+yOff, clickStack.buttons[i].foamThickness,clickStack.buttons[i].foamSlotWidth,in,corner,z,toolR,2  );
+       }
+       
+       
+       F.plus("G01 Z2");
+       F.plus("G00 F" + normalSpeed);
+        
+       //pcb holder
+       for(float z = otherReliefDepth*-1; z >= buttonReliefDepth*-1; z -= normalStep){
+         rectangularFace(   ((clickStack.buttons[i].buttonPCBTL[1]+xOff-actuatorPosOffset))+0,((clickStack.buttons[i].buttonPCBTL[0]+yOff))+0,    buttonPCBDimension[1],buttonPCBDimension[0],in,corner,z,toolR,2  );
+       }
+       
+       F.plus("G01 Z2");
+       F.plus("G00 F" + normalSpeed);
+       
+       //wire track in button area
+       lineOptimized(((xOff+clickStack.buttons[i].buttonActuatorY))+0,((yOff+(clickStack.buttons[i].pedalW/2))) + 0,((xOff+clickStack.buttons[i].pedalLedgeW))+toolR + 0,((yOff+(clickStack.buttons[i].pedalW/2))) + 0,otherReliefDepth*-1,(otherReliefDepth+wireTrackDepth)*-1,normalStep);//first line reaches ledge.
+       
+       //carve thru ledge
+       lineOptimized(((xOff+clickStack.buttons[i].pedalLedgeW)) + 0+toolR, ((yOff+(clickStack.buttons[i].pedalW/2))) + 0, ((xOff)) + 0 - toolR,((yOff+(clickStack.buttons[i].pedalW/2))) + 0,0,(otherReliefDepth+wireTrackDepth)*-1,normalStep);//base level buttons carve thru the ledge.
+       
+       
+       //screw locations 
+       F.plus("G01 Z2");
+       F.plus("G00 F" + normalSpeed);
+       drillHole((xOff+clickStack.buttons[i].pedalLedgeW/2)+0,(yOff+pedalScrewClearance)+0,-.5);
+       drillHole((xOff+clickStack.buttons[i].pedalLedgeW/2)+0,(yOff+clickStack.buttons[i].pedalW-pedalScrewClearance)+0,-.5);
+       
+       yOff+= clickStack.buttons[i].pedalW+yClearance;
+       
+       //now here we cut out more stacks if needed
+       int stackTracker = clickStack.buttons[i].level-1; 
+       
+       while(stackTracker > 0){
+         if(yOff+clickStack.buttons[i].pedalW > yLimit){ 
+          yOff = 0;
+          xOff += clickStack.buttons[i].pedalL+xClearance; //thisll be more complicated if you want variable length pedals, so for now best to keep them all the same length.  IDK why you'd want different lengths anyway.
+         }
          tabSize = 0;
          for(float z = 0; z >= stockT*-1; z -= normalStep){
            if(z <= (stockT-1) *-1){ tabSize = 10;}
-           cutRectangle((clickStack.buttons[i].x)+0,(clickStack.buttons[i].y)+0,clickStack.buttons[i].pedalW,clickStack.buttons[i].pedalL,out,corner,z,toolR,0,2);
+           cutRectangle(xOff,yOff,clickStack.buttons[i].pedalL,clickStack.buttons[i].pedalW,out,corner,z,toolR,tabSize,2);
          }
-         tabSize = 0;*/
+          
+         tabSize = 0;
+        
+         stackTracker --;
+         yOff+= clickStack.buttons[i].pedalW+yClearance;
+       }
+       
+       }//end higher level button if
+    }//end button loop
+  
+   footer();
+   
+   F.export("job" + job +".nc");
+  println("exported job " + job + " to sketch folder"); 
+  F.reset();
+  
+  job++;
+  
+  //-----------------------------------------------------------------------------JOB 2 plastic panels
+  
+  header();
+  //button stack outlines.  
+    
+   
+   
+ 
+   footer();
+   
+   F.export("job" + job +".nc");
+  println("exported job " + job + " to sketch folder"); 
+ 
+  
          
 }
 
@@ -570,6 +679,7 @@ void header(){
     F.plus("M03");
     F.plus("G00 Z2");
     F.plus("G00 X0 Y0"); 
+    tabSize = 0;
 }
 
 void footer(){
