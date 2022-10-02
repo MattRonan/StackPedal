@@ -44,6 +44,7 @@ float mcuL = 43;
 float mcuH = 7.5; //total height of board.  This determines how deep the mcu pocket will be.
 float mcuUSBW = 7.5; //width of usb jack.  Determines width of opening in plactic side panel.
 float mcuUSBH = 3.75; //height of usb jack.  Determines how tall the opening is in the plastic side panel.
+float usbPanelBottomMargin = 3;
 float mcuUSBHeightOffset = 0;// on some boards such as ESP32, the usb jack might not be the highest point.  This is how much lower the usb jack is than the highest point.  (highest point in those cases is usually a PH connector)
 int mcuJackWall = 1;  //Which wall does the jack come out of.  0 = left side, 1 = back side, 2 = right side 
 float mcuJackPos = .5; //shift the location of the jack by inputting a value from 0-1.  .5 puts it in the middle of that wall.
@@ -56,6 +57,7 @@ float buttonReliefDepth = 8; //section where button+PCB sits.  with a 5mm button
 float otherReliefDepth = 5; //where the button isnt, remove enough material so that the plastic presser panels dont get blocked by wood when pressed.
 float wireTrackDepth = 3;
 float ledgeClearance = 6;
+
 //------------------------------------------------------------
 
 float[] buttonPCBDimension = {18,12}; //the official PCB is on osh park at https://oshpark.com/shared_projects/baTaN6WL
@@ -470,13 +472,13 @@ void exportGCode(){
      //usb recess
      switch(mcuJackWall){
          case 0:         
-                 lineOptimized(0+0,  (clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)  +0,  0+0,  ((clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)+0,0,(mcuH+3)*-1,normalStep);
+                 lineOptimized(0+0,  (clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)  +0,  0+0,  ((clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)+0,0,(mcuH+usbPanelBottomMargin)*-1,normalStep);
                  break;
          case 1:             
-                 lineOptimized((clickStack.mcuTL[0]-(usbPanelL-mcuW)/2)  + 0,  0+0, ((clickStack.mcuTL[0]-(usbPanelL-mcuW)/2)+usbPanelL)+0,  0+0,0,(mcuH+3)*-1,normalStep);
+                 lineOptimized((clickStack.mcuTL[0]-(usbPanelL-mcuW)/2)  + 0,  0+0, ((clickStack.mcuTL[0]-(usbPanelL-mcuW)/2)+usbPanelL)+0,  0+0,0,(mcuH+usbPanelBottomMargin)*-1,normalStep);
                  break;
          case 2:  
-                 lineOptimized(clickStack.baseWidth+0,  (clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)  + 0,  clickStack.baseWidth+0,  ((clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)+0,0,(mcuH+3)*-1,normalStep);
+                 lineOptimized(clickStack.baseWidth+0,  (clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)  + 0,  clickStack.baseWidth+0,  ((clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)+0,0,(mcuH+usbPanelBottomMargin)*-1,normalStep);
                  break;
        }
    
@@ -491,7 +493,8 @@ void exportGCode(){
      
        //general relief to leave a ledge
        for(float z = 0; z >= otherReliefDepth*-1; z -= normalStep){
-         rectangularFace((clickStack.buttons[i].x) + 0, ((clickStack.buttons[i].y+clickStack.buttons[i].pedalLedgeW)) + 0 , clickStack.buttons[i].pedalW,clickStack.buttons[i].pedalL -clickStack.buttons[i].pedalLedgeW,in,corner,z,toolR,2 );
+                                                         //note for level0 buttons, we cut it wider than the outline dictates (hence the defaultPedalMargin subtraction and then increasing W by margin*2) cause otherwise the presser panel would get hung up on the wood.  Not a problem for higher level buttons.
+         rectangularFace((clickStack.buttons[i].x) + 0-clickStack.defaultPedalMargin, ((clickStack.buttons[i].y+clickStack.buttons[i].pedalLedgeW)) + 0  , clickStack.buttons[i].pedalW + (clickStack.defaultPedalMargin*2),clickStack.buttons[i].pedalL -clickStack.buttons[i].pedalLedgeW,in,corner,z,toolR,2 );
        }
        
        tabSize = 0;
@@ -536,7 +539,7 @@ void exportGCode(){
    
    //outline base
    tabSize = 0; 
-   for(float z = 0; z >= stockT*-1; z -= normalStep){
+   for(float z = 0; z >= (stockT+1)*-1; z -= normalStep){
      if(z <= (stockT-defaultTabT) *-1){ tabSize = 20;}
      cutRectangle(0,0,clickStack.baseWidth,clickStack.baseHeight,out,corner,z,toolR,tabSize,2); 
    }
@@ -571,18 +574,9 @@ void exportGCode(){
         yOff = 0;
         xOff += clickStack.buttons[i].pedalL+xClearance; //thisll be more complicated if you want variable length pedals, so for now best to keep them all the same length.  IDK why you'd want different lengths anyway.
       }
-      
-      tabSize = 0;
-      for(float z = 0; z >= stockT*-1; z -= normalStep){
-        if(z <= (stockT-1) *-1){ tabSize = 10;}
-        cutRectangle(xOff,yOff,clickStack.buttons[i].pedalL,clickStack.buttons[i].pedalW,out,corner,z,toolR,tabSize,2);
-      }
-      
-      tabSize = 0;
-      
+       
       F.plus("F"+normalSpeed);
       F.plus("G01 Z02");
-      
       
       //general relief to leave a ledge
        for(float z = 0; z >= otherReliefDepth*-1; z -= normalStep){
@@ -622,18 +616,30 @@ void exportGCode(){
        drillHole((xOff+clickStack.buttons[i].pedalLedgeW/2)+0,(yOff+pedalScrewClearance)+0,-.5);
        drillHole((xOff+clickStack.buttons[i].pedalLedgeW/2)+0,(yOff+clickStack.buttons[i].pedalW-pedalScrewClearance)+0,-.5);
        
+       //outline stack block
+       tabSize = 0;
+      for(float z = 0; z >= (stockT+1)*-1; z -= normalStep){
+        if(z <= (stockT-1) *-1){ tabSize = 10;}
+        cutRectangle(xOff,yOff,clickStack.buttons[i].pedalL,clickStack.buttons[i].pedalW,out,corner,z,toolR,tabSize,2);
+      }
+      
+      tabSize = 0;
+       
        yOff+= clickStack.buttons[i].pedalW+yClearance;
        
        //now here we cut out more stacks if needed
        int stackTracker = clickStack.buttons[i].level-1; 
        
        while(stackTracker > 0){
+         
          if(yOff+clickStack.buttons[i].pedalW > yLimit){ 
           yOff = 0;
           xOff += clickStack.buttons[i].pedalL+xClearance; //thisll be more complicated if you want variable length pedals, so for now best to keep them all the same length.  IDK why you'd want different lengths anyway.
          }
+         
          tabSize = 0;
-         for(float z = 0; z >= stockT*-1; z -= normalStep){
+         
+         for(float z = 0; z >= (stockT+1)*-1; z -= normalStep){
            if(z <= (stockT-1) *-1){ tabSize = 10;}
            cutRectangle(xOff,yOff,clickStack.buttons[i].pedalL,clickStack.buttons[i].pedalW,out,corner,z,toolR,tabSize,2);
          }
@@ -641,6 +647,7 @@ void exportGCode(){
          tabSize = 0;
         
          stackTracker --;
+         
          yOff+= clickStack.buttons[i].pedalW+yClearance;
        }
        
@@ -655,20 +662,113 @@ void exportGCode(){
   
   job++;
   
-  //-----------------------------------------------------------------------------JOB 2 plastic panels
+  //-----------------------------------------------------------------------------JOB 2 plastic presser panels
+  //like job 1, I flipped x and y so the long dimensions follow the y axis, just cause on small machines that might matter.  
+  xOff = 0;
+  yOff = 0;
+  yLimit = stockW-15; 
+  yClearance = 15;
+  xClearance = 20;
   
   header();
-  //button stack outlines.  
+  
+  //panel outlines 
+   tabSize = 0;
+   for(int i = 0; i < clickStack.numButtons; i++){
+     
+      //screw locations 
+       F.plus("G01 Z2");
+       F.plus("G00 F" + normalSpeed);
+       drillHole((xOff+clickStack.buttons[i].pedalLedgeW/2)+0,(yOff+pedalScrewClearance)+0,(plasticT+.25)*-1);
+       drillHole((xOff+clickStack.buttons[i].pedalLedgeW/2)+0,(yOff+clickStack.buttons[i].pedalW-pedalScrewClearance)+0,(plasticT+.25)*-1);
+       
+       
+     for(float z = 0; z >= (plasticT+.5)*-1; z -= microStep){
+       if(z <= (plasticT-.5) *-1){ tabSize = 10;}
+       cutRectangle(xOff,yOff,clickStack.buttons[i].pedalL,clickStack.buttons[i].pedalW,out,corner,z,toolR,tabSize,2);
+     }
+    
+     tabSize = 0;
+     F.plus("Z02");
+     
     
    
+   yOff+= clickStack.buttons[i].pedalW+yClearance;
+       
+     
+   if(yOff+clickStack.buttons[i].pedalW > yLimit){ 
+        yOff = 0;
+        xOff += clickStack.buttons[i].pedalL+xClearance; //thisll be more complicated if you want variable length pedals, so for now best to keep them all the same length.  IDK why you'd want different lengths anyway.
+       }
+   }
    
  
    footer();
    
    F.export("job" + job +".nc");
-  println("exported job " + job + " to sketch folder"); 
- 
+   println("exported job " + job + " to sketch folder"); 
+   F.reset();
   
+   job++;
+   
+   //---------------------------------------------------------------------------------------job3 top cover and usb panels
+   
+  
+   header();
+   
+   xOff = 0;
+   yOff = 0;
+   //top cover
+   
+   //screw holes
+   //mark screw locations for top cover. TODO for more/custom screw holes these need to be an array and then you can add however many you want and loop thru
+   drillHole(topCoverScrewClearance+0,(baseHeight-clickStack.defaultPedalL-topCoverScrewClearance)+0,(plasticT+.25)*-1); //BL
+   drillHole(topCoverScrewClearance+0,topCoverScrewClearance+0,(plasticT+.25)*-1); //TL
+   drillHole((clickStack.baseWidth-topCoverScrewClearance)+0,topCoverScrewClearance+0,(plasticT+.25)*-1); //TR
+   drillHole((clickStack.baseWidth-topCoverScrewClearance)+0,(baseHeight-clickStack.defaultPedalL-topCoverScrewClearance)+0,(plasticT+.25)*-1); //BR
+      
+   //outline base
+   tabSize = 0; 
+   for(float z = 0; z >= (plasticT+.5)*-1; z -= microStep){
+     if(z <= (plasticT-.5) *-1){ tabSize = 20;}
+     cutRectangle(0,0,clickStack.baseWidth,clickStack.baseHeight-clickStack.defaultPedalL,out,corner,z,toolR,tabSize,2); 
+   }
+   tabSize = 0;   
+   
+   F.plus("Z02");
+   
+   yOff+= clickStack.baseHeight-clickStack.defaultPedalL + yClearance;
+       
+   
+   //usb cutout
+   for(float z = 0; z >= (plasticT+.5)*-1; z -= microStep){
+     rectangularFace(xOff+(usbPanelL/2)-(mcuUSBW/2),  yOff,  mcuUSBW,  mcuUSBH,in,corner,z,toolR,2);
+   }
+   
+   //screw locations 
+   F.plus("G01 Z2");
+   F.plus("G00 F" + normalSpeed);
+   drillHole(xOff+4,  yOff+(mcuH+usbPanelBottomMargin)/2,(plasticT+.25)*-1);
+   drillHole(xOff+usbPanelL-4,  yOff+(mcuH+usbPanelBottomMargin)/2,(plasticT+.25)*-1);
+   
+   
+   //do the usb panel outline
+   tabSize = 0; 
+   for(float z = 0; z >= (plasticT+.5)*-1; z -= microStep){
+     if(z <= (plasticT-.5) *-1){ tabSize = 7;}
+     cutRectangle(xOff,  yOff,  usbPanelL,  mcuH+usbPanelBottomMargin,out,corner,z,toolR,tabSize,2);
+   }
+   tabSize = 0;  
+   
+   
+   
+   footer();
+   
+   F.export("job" + job +".nc");
+   println("exported job " + job + " to sketch folder"); 
+   F.reset();
+  
+   job++;
          
 }
 
@@ -729,7 +829,6 @@ void drillHole(float x, float y, float zee){
            F.plus("F" + plungeSpeed);
            F.plus("G01 Z" + z);
            F.plus("F" + normalSpeed);
-           F.plus("G01 Z" + (z+1));
          }
          
          F.plus("G00 Z2");
