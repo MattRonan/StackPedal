@@ -40,8 +40,11 @@ float mcuJackPos = .5; //shift the location of the jack by inputting a value fro
 float mcuConnectionClearanceSize = 5; //open up some space around mcu to help wires fit in easier.  this is how far it extends out from the pins. 
 float clearanceFactor = .65;//Percent of material to remove along mcu pocket sides.  greater than .75 is going to risk the mcu not being held in place as sungly.
 float usbPanelL = mcuW + 20; // 20 gives 10mm on each side for the mounting screws for the usb panel.  More isnt neccessary and less might cause structural issues, especially if the wood is pine.
+float pedalScrewClearance = 8;
+float topCoverScrewClearance = 4;
 //------------------------------------------------------------
 
+float[] buttonPCBDimension = {18,12}; //the official PCB is on osh park at https://oshpark.com/shared_projects/baTaN6WL
 float actuatorPosOffset = 1.5;  //button on official pcbs is not directly in the center, so this offset accounts for that.
 
 ClickStack clickStack = new ClickStack(stockT,baseHeight);
@@ -49,6 +52,15 @@ ClickStack clickStack = new ClickStack(stockT,baseHeight);
 int escapeTime = 0;
 
 boolean drawDesign = true;
+
+float hyp;
+float theta;
+float a,b;
+float tabSize = 0;
+float stepover = 2;
+float zO = 0;
+
+OutputFile F = new OutputFile(60000);
 
 void setup() {
   
@@ -98,21 +110,28 @@ void draw() {
   
   if(keyPressed && millis() > escapeTime){
     if(key == 'p'){
-      println("butt");
       exportTemplate();
+      keyPressed = false; //idk why these keys sometimes stick but this solves that
+    }
+    if(key == 'g'){
+      println("exporting");
+      exportGCode();
       keyPressed = false;
     }
     else if(key == '0'){
       drawDesign = true;
       mcuJackWall = 0;
+      clickStack.recalculatePedal();
     }
     else if(key == '1'){
       drawDesign = true;
       mcuJackWall = 1;
+      clickStack.recalculatePedal();
     }
     else if(key == '2'){
       drawDesign = true;
       mcuJackWall = 2;
+      clickStack.recalculatePedal();
     }
     
     escapeTime = millis() + 120;
@@ -138,25 +157,23 @@ class ClickStack{
   public int numButtons = 0;
   
   public float[] origin = {20,60}; //top left corner of base in pixels
-  public float[] bottomLeft = new float[2];
-  
+ 
   public float sF; //scaleFactor;
   
-  public float[] buttonPCBDimension = {18,12}; //the official PCB is on osh park at https://oshpark.com/shared_projects/baTaN6WL
+  float[] mcuCenter = {0,0};
+  float[] mcuTL = {0,0};
   
   PedalButton[] buttons = new PedalButton[5]; 
   
   public ClickStack(float stockT, float baseHeight){
      this.stockT = stockT;
      this.baseHeight = baseHeight;
-     this.bottomLeft[0] = this.origin[0] + this.baseHeight;
-     this.bottomLeft[1] = this.origin[1] + this.baseHeight;
   }
   
   public void addButton(int level){
     buttons[numButtons] = new PedalButton(level);
     numButtons++;
-    println("recalculating");
+    //println("recalculating");
     recalculatePedal();
   }
    
@@ -176,6 +193,24 @@ class ClickStack{
       buttons[i].x = baseWidth;
       baseWidth += buttons[i].pedalW;
     }
+    
+    switch(mcuJackWall){
+         case 0: mcuTL[0] = plasticT;//this looks wierd but its just that we recess the plastic usb panel, which pushes the mcu right in this case, where it would otherwise be at 0
+                 mcuTL[1] = (baseHeight-ClickStack.this.defaultPedalL)*mcuJackPos-(mcuW/2);
+                 mcuCenter[0] = mcuTL[0] + mcuL/2;
+                 mcuCenter[1] = mcuTL[1] +(mcuW/2);
+                 break;
+         case 1: mcuTL[0] = (this.baseWidth*mcuJackPos) - (mcuW/2);
+                 mcuTL[1] = plasticT;
+                 mcuCenter[0] = mcuTL[0] + mcuW/2;
+                 mcuCenter[1] = mcuTL[1] +(mcuL/2);
+                 break;
+         case 2:  mcuTL[0] = this.baseWidth-mcuL;//this looks wierd but its just that we recess the plastic usb panel, which pushes the mcu right in this case, where it would otherwise be at 0
+                 mcuTL[1] = (baseHeight-ClickStack.this.defaultPedalL)*mcuJackPos-(mcuW/2);
+                 mcuCenter[0] = mcuTL[0] + mcuL/2;
+                 mcuCenter[1] = mcuTL[1] +(mcuW/2);
+                 break;
+       }
   }
   
   public void update(){ //draw all the features of the current pedal design
@@ -185,45 +220,31 @@ class ClickStack{
      stroke(0);
      strokeWeight(5);
      rect(this.origin[0],this.origin[1],this.baseWidth*sF,this.baseHeight*sF);
-     
-     float[] mcuCenter = {0,0};
-     float[] mcuTL = {0,0};
-     
+ 
      //mcu and related pockets
        stroke(252,250,0);
        strokeWeight(3);
        switch(mcuJackWall){
-         case 0: mcuTL[0] = plasticT;//this looks wierd but its just that we recess the plastic usb panel, which pushes the mcu right in this case, where it would otherwise be at 0
-                 mcuTL[1] = (baseHeight-ClickStack.this.defaultPedalL)*mcuJackPos-(mcuW/2);
+         case 0: 
                  rect((mcuTL[0]*sF) + this.origin[0], (mcuTL[1]*sF) + origin[1],  mcuL*sF,  mcuW*sF  ); //mcu pocket
                  rect((mcuTL[0]*sF)+this.origin[0]+((mcuL-(mcuL*clearanceFactor))/2*sF),  (( mcuTL[1] - mcuConnectionClearanceSize )*sF)+this.origin[1],  (mcuL*clearanceFactor)*sF,  (mcuW+(mcuConnectionClearanceSize*2))*sF  ); //extra relief for wires
                  strokeWeight(5);
                  line(0+origin[0],  (mcuTL[1]-(usbPanelL-mcuW)/2) * sF +origin[1],  0+origin[0],  ((mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)*sF+origin[1]);
-                 mcuCenter[0] = mcuTL[0] + mcuL/2;
-                 mcuCenter[1] = mcuTL[1] +(mcuW/2);
                  strokeWeight(4);
-               
                  break;
-         case 1: mcuTL[0] = (this.baseWidth*mcuJackPos) - (mcuW/2);
-                 mcuTL[1] = plasticT;
+         case 1: 
                  rect((mcuTL[0]*sF) + this.origin[0], (mcuTL[1]*sF) + origin[1],  mcuW*sF,  mcuL*sF  ); //mcu pocket
                  rect(((mcuTL[0] - mcuConnectionClearanceSize)*sF) + this.origin[0], (mcuTL[1]*sF) + origin[1]+((mcuL-(mcuL*clearanceFactor))/2*sF), ( mcuW+mcuConnectionClearanceSize*2)*sF,  mcuL*sF*clearanceFactor  ); 
                  strokeWeight(5);
                  line((mcuTL[0]-(usbPanelL-mcuW)/2) * sF + origin[0],  0+origin[1], ((mcuTL[0]-(usbPanelL-mcuW)/2)+usbPanelL)*sF+origin[0],  0+origin[1]);
-                 mcuCenter[0] = mcuTL[0] + mcuW/2;
-                 mcuCenter[1] = mcuTL[1] +(mcuL/2);
                  strokeWeight(4);
                  break;
-         case 2:  mcuTL[0] = this.baseWidth-mcuL;//this looks wierd but its just that we recess the plastic usb panel, which pushes the mcu right in this case, where it would otherwise be at 0
-                 mcuTL[1] = (baseHeight-ClickStack.this.defaultPedalL)*mcuJackPos-(mcuW/2);
+         case 2:  
                  rect((mcuTL[0]*sF) + this.origin[0], (mcuTL[1]*sF) + origin[1],  mcuL*sF,  mcuW*sF  ); //mcu pocket
                  rect((mcuTL[0]*sF)+this.origin[0]+((mcuL-(mcuL*clearanceFactor))/2*sF),  (( mcuTL[1] - mcuConnectionClearanceSize )*sF)+this.origin[1],  (mcuL*clearanceFactor)*sF,  (mcuW+(mcuConnectionClearanceSize*2))*sF  ); //extra relief for wires
                  strokeWeight(5);
                  line(this.baseWidth*sF+origin[0],  (mcuTL[1]-(usbPanelL-mcuW)/2) * sF +origin[1],  this.baseWidth*sF+origin[0],  ((mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)*sF+origin[1]);
-                 mcuCenter[0] = mcuTL[0] + mcuL/2;
-                 mcuCenter[1] = mcuTL[1] +(mcuW/2);
                  strokeWeight(4);
-               
                  break;
      
        }
@@ -273,15 +294,15 @@ class ClickStack{
        //screw locactions
        stroke(100,100,5);
        //peeal screws
-       circle((buttons[i].x+8)*sF+origin[0],(buttons[i].y+buttons[i].pedalLedgeW/2)*sF+origin[1],toolR*2*sF);
-       circle((buttons[i].x+buttons[i].pedalW-8)*sF+origin[0],(buttons[i].y+buttons[i].pedalLedgeW/2)*sF+origin[1],toolR*2*sF);
+       circle((buttons[i].x+pedalScrewClearance)*sF+origin[0],(buttons[i].y+buttons[i].pedalLedgeW/2)*sF+origin[1],toolR*2*sF);
+       circle((buttons[i].x+buttons[i].pedalW-pedalScrewClearance)*sF+origin[0],(buttons[i].y+buttons[i].pedalLedgeW/2)*sF+origin[1],toolR*2*sF);
        
        //top cover screws.  For now it just does 4 corner screws.  If you need more its easy to add them by hand, since the 4 done by the machine will hold it perfectly aligned.  TODO, ability to add more screws in specific locations
-       float c = 5;
-       circle(c*sF+origin[0],(baseHeight-defaultPedalL-c)*sF+origin[1],toolR*2*sF); //BL
-       circle(c*sF+origin[0],c*sF+origin[1],toolR*2*sF); //TL
-       circle((this.baseWidth-c)*sF+origin[0],c*sF+origin[1],toolR*2*sF); //TR
-       circle((this.baseWidth-c)*sF+origin[0],(baseHeight-defaultPedalL-c)*sF+origin[1],toolR*2*sF); //BR
+       
+       circle(topCoverScrewClearance*sF+origin[0],(baseHeight-defaultPedalL-topCoverScrewClearance)*sF+origin[1],toolR*2*sF); //BL
+       circle(topCoverScrewClearance*sF+origin[0],topCoverScrewClearance*sF+origin[1],toolR*2*sF); //TL
+       circle((this.baseWidth-topCoverScrewClearance)*sF+origin[0],topCoverScrewClearance*sF+origin[1],toolR*2*sF); //TR
+       circle((this.baseWidth-topCoverScrewClearance)*sF+origin[0],(baseHeight-defaultPedalL-topCoverScrewClearance)*sF+origin[1],toolR*2*sF); //BR
       
        //draw info
        text("Level = " + buttons[i].level, ((buttons[i].buttonPCBTL[0]+buttons[i].x)*sF)+this.origin[0],  ((buttons[i].buttonPCBTL[1]+buttons[i].y+ buttonPCBDimension[1]+3)*sF)+this.origin[1]);
@@ -341,8 +362,8 @@ class ClickStack{
       this.foamSlotTL[0] = ((pedalW-foamSlotWidth) * this.foamSlotPercent);//basically from the buttons perspective, TL of button is 0,0
       this.foamSlotTL[1] = this.pedalL - this.foamSlotWall - this.foamThickness;
    
-      this.buttonPCBTL[0] = ((this.pedalW/2)-(ClickStack.this.buttonPCBDimension[0]/2));
-      this.buttonPCBTL[1] = this.buttonActuatorY - (ClickStack.this.buttonPCBDimension[1]/2);
+      this.buttonPCBTL[0] = ((this.pedalW/2)-(buttonPCBDimension[0]/2));
+      this.buttonPCBTL[1] = this.buttonActuatorY - (buttonPCBDimension[1]/2);
     }
   }
 }
@@ -368,4 +389,421 @@ void exportTemplate(){
   
   saveFrame(peeth);
   
+}
+
+
+
+
+
+
+//--------------------------------------------------------------------------GCODE ZONE----------------------------------------
+//--------------------------------------------------------------------------GCODE ZONE----------------------------------------
+//--------------------------------------------------------------------------GCODE ZONE----------------------------------------
+//--------------------------------------------------------------------------GCODE ZONE----------------------------------------
+//--------------------------------------------------------------------------GCODE ZONE----------------------------------------
+//--------------------------------------------------------------------------GCODE ZONE----------------------------------------
+//--------------------------------------------------------------------------GCODE ZONE----------------------------------------
+
+//gcode note.  Processing thinks of the top left corner as 0,0.  But on a cnc machine it's the bottom left corner, ir moving the head from 0,0  to  0,10 will go in the reverse direction as in Processing.
+//
+
+void exportGCode(){
+   
+  int job = 0;
+  
+  float bigStep = 1;
+  float normalStep = .5;
+  float smallStep = .25;
+  int in = 0;
+  int out = 1;
+  int corner = 0;
+  int cent = 1;
+  
+  //job 0 is the base
+  header();
+    
+   F.plus("F"+highSpeed);
+   
+   //mark screw locations for top cover
+   drillHole(topCoverScrewClearance+0,(baseHeight-clickStack.defaultPedalL-topCoverScrewClearance)+0,-.5); //BL
+   drillHole(topCoverScrewClearance+0,topCoverScrewClearance+0,-.5); //TL
+   drillHole((clickStack.baseWidth-topCoverScrewClearance)+0,topCoverScrewClearance+0,-.5); //TR
+   drillHole((clickStack.baseWidth-topCoverScrewClearance)+0,(baseHeight-clickStack.defaultPedalL-topCoverScrewClearance)+0,-.5); //BR
+       
+   cutRectangle(0,0,clickStack.baseWidth,clickStack.baseHeight,out,corner,0,toolR,0,2); //outline bass (actually do this at the end)
+   
+   F.plus("G01 Z2");
+   F.plus("G00 F" + normalSpeed);
+ 
+   for(float z = 0; z >= mcuH*-1; z -= normalStep){
+     switch(mcuJackWall){
+           case 0: 
+                   rectangularFace((clickStack.mcuTL[0]) + 0, (clickStack.mcuTL[1]) +0,  mcuL,  mcuW,in,corner,z,toolR,2 ); //clickStack.mcu pocket
+                   rectangularFace((clickStack.mcuTL[0])+0+((mcuL-(mcuL*clearanceFactor))/2),  (( clickStack.mcuTL[1] - mcuConnectionClearanceSize ))+0,  (mcuL*clearanceFactor),  (mcuW+(mcuConnectionClearanceSize*2)),in,corner,z,toolR,2  ); //extra relief for wires           
+                 
+                   break;
+           case 1: 
+                   rectangularFace((clickStack.mcuTL[0]) + 0, (clickStack.mcuTL[1]) +0,  mcuW,  mcuL,in,corner,z,toolR,2  ); //clickStack.mcu pocket
+                   rectangularFace(((clickStack.mcuTL[0] - mcuConnectionClearanceSize)) + 0, (clickStack.mcuTL[1]) +0+((mcuL-(mcuL*clearanceFactor))/2), ( mcuW+mcuConnectionClearanceSize*2),  mcuL*clearanceFactor,in,corner,z,toolR,2  );               
+                   
+                   break;
+           case 2:  
+                   rectangularFace((clickStack.mcuTL[0]) + 0, (clickStack.mcuTL[1]) +0, mcuL,  mcuW,in,corner,z,toolR,2  ); //clickStack.mcu pocket
+                   rectangularFace((clickStack.mcuTL[0])+0+((mcuL-(mcuL*clearanceFactor))/2),  (( clickStack.mcuTL[1] - mcuConnectionClearanceSize ))+0,  (mcuL*clearanceFactor),  (mcuW+(mcuConnectionClearanceSize*2)),in,corner,z,toolR,2  ); //extra relief for wires
+                  
+                   break;
+         }
+     }
+     
+     F.plus("G01 Z2");
+     F.plus("G00 F" + normalSpeed);
+     
+     //usb recess
+     for(float z = 0; z >= (mcuH+3)*-1; z -= normalStep){
+       switch(mcuJackWall){
+           case 0:         
+                   justALine(0+0,  (clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)  +0,  0+0,  ((clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)+0,z);
+                   break;
+           case 1:             
+                   justALine((clickStack.mcuTL[0]-(usbPanelL-mcuW)/2)  + 0,  0+0, ((clickStack.mcuTL[0]-(usbPanelL-mcuW)/2)+usbPanelL)+0,  0+0,z);
+                   break;
+           case 2:  
+                   justALine(clickStack.baseWidth+0,  (clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)  + 0,  clickStack.baseWidth+0,  ((clickStack.mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)+0,z);
+                   break;
+         }
+     }
+     
+     F.plus("G01 Z2");
+     F.plus("G00 F" + normalSpeed);
+     
+     //level 0 button related
+     for(int i = 0; i < clickStack.numButtons; i++){
+     
+       if(clickStack.buttons[i].level == 0){ //any level 0 buttons end up in job0 where we cut the base.  Other ones get put into job1
+       
+         //button stack outline
+         
+         //this doesnt happen on level 0 buttons
+         
+         tabSize = 0;
+         for(float z = 0; z >= stockT*-1; z -= normalStep){
+           if(z <= (stockT-1) *-1){ tabSize = 10;}
+           cutRectangle((clickStack.buttons[i].x)+0,(clickStack.buttons[i].y)+0,clickStack.buttons[i].pedalW,clickStack.buttons[i].pedalL,out,corner,z,toolR,0,2);
+         }
+         tabSize = 0;
+         
+         //general relief to leave a ledge
+         for(float z = 0; z >= stockT*-1; z -= normalStep){
+           rectangularFace((clickStack.buttons[i].x) + 0, ((clickStack.buttons[i].y+clickStack.buttons[i].pedalLedgeW)) + 0 , clickStack.buttons[i].pedalW,clickStack.buttons[i].pedalL -clickStack.buttons[i].pedalLedgeW,in,corner,z,toolR,2 );
+         }
+         
+         tabSize = 0;
+         F.plus("G01 Z2");
+         F.plus("G00 F" + normalSpeed);
+         
+         //foam slot
+         for(float z = 0; z >= stockT*-1; z -= normalStep){
+           rectangularFace( ((clickStack.buttons[i].foamSlotTL[0]+clickStack.buttons[i].x))+0,  ((clickStack.buttons[i].foamSlotTL[1]+clickStack.buttons[i].y))+0,  clickStack.buttons[i].foamSlotWidth,  clickStack.buttons[i].foamThickness,in,corner,z,toolR,2  );
+         }
+         
+         F.plus("G01 Z2");
+         F.plus("G00 F" + normalSpeed);
+          
+         //pcb holder
+         for(float z = 0; z >= stockT*-1; z -= normalStep){
+           cutRectangle( ((clickStack.buttons[i].buttonPCBTL[0]+clickStack.buttons[i].x))+0,  ((clickStack.buttons[i].buttonPCBTL[1]+clickStack.buttons[i].y-actuatorPosOffset))+0,  buttonPCBDimension[0],  buttonPCBDimension[1],out,corner,z,toolR,0,2  );
+         }
+         
+         F.plus("G01 Z2");
+         F.plus("G00 F" + normalSpeed);
+         
+         /*
+         //wire tracks
+         line(((buttons[i].x+(buttons[i].pedalW/2))) + 0,((buttons[i].y+buttons[i].buttonActuatorY))+0,((buttons[i].x+(buttons[i].pedalW/2))) + 0,((buttons[i].y+buttons[i].pedalLedgeW)) + 0);//first line reaches ledge.
+         //0 only
+         line(((buttons[i].x+(buttons[i].pedalW/2))) + 0, ((buttons[i].y+buttons[i].pedalLedgeW)) + 0, ((buttons[i].x+(buttons[i].pedalW/2))) + 0, ((buttons[i].y)) + 0);//base level buttons carve thru the ledge.
+         
+         line(((buttons[i].x+(buttons[i].pedalW/2))) + 0, ((buttons[i].y)) + 0,((buttons[i].x+(buttons[i].pedalW/2))) + 0,((buttons[i].y-6)) + 0);//carve straight out from edge of button before heading to mcu
+         
+         line(((buttons[i].x+(buttons[i].pedalW/2))) + 0,((buttons[i].y-6)) + 0,mcuCenter[0]+origin[0],mcuCenter[1]+origin[1]);//now carve to mcu pocket
+          
+          */
+          
+         //screw locactions
+         drillHole((clickStack.buttons[i].x+pedalScrewClearance)+0,(clickStack.buttons[i].y+clickStack.buttons[i].pedalLedgeW/2)+0,toolR*2);
+         drillHole((clickStack.buttons[i].x+clickStack.buttons[i].pedalW-pedalScrewClearance)+0,(clickStack.buttons[i].y+clickStack.buttons[i].pedalLedgeW/2)+0,toolR*2);
+       }
+     
+     }//end button loop
+     
+  
+ 
+     
+     
+       
+     
+    
+  footer();
+  F.export("job" + job +".nc");
+  println("exported job " + job + " to sketch folder"); 
+  F.reset();
+    
+    
+  job++;
+}
+
+void header(){
+    F.plus("G17 G21 G90 G94 G40");
+    F.plus("M05");
+    F.plus("F" + normalSpeed+" S1000");
+    F.plus("M03");
+    F.plus("G00 Z2");
+    F.plus("G00 X0 Y0"); 
+}
+
+void footer(){
+    F.plus("G00 Z2");
+    F.plus("M05");
+    F.plus("M02"); 
+}
+
+void justALine(float xS, float yS, float xE, float yE, float z){
+  
+     F.plus("G01 X"+ze((xS)) + " Y" + ze((yS)));//inital positionning
+     F.plus("F"+plungeSpeed);
+     F.plus("G01 Z"+ze(z)); //go to requested depth
+     F.plus("F"+normalSpeed);
+  
+     F.plus("G01 X"+ze(xE) + " Y" + ze(yE)); //move to end point
+   
+}
+void drillHole(float x, float y, float zee){
+       for(float z = 0; z >= zee; z -= .5){
+           F.plus("F"+normalSpeed);
+           F.plus("G01 X" + (x) + " Y" + (y));
+           F.plus("F" + plungeSpeed);
+           F.plus("G01 Z" + z);
+           F.plus("F" + normalSpeed);
+           F.plus("G01 Z" + (z+1));
+         }
+         
+         F.plus("G00 Z2");
+         F.plus("F"+normalSpeed);
+}
+
+void rectangularFace(float x, float y, float l, float w, int inOut, int cornOrCent, float z, float toolR, float stepover){
+  //xy either refers to top left corner or to center. defined by cornOrCent
+          
+  
+  if(cornOrCent == 0){  
+  }
+  else if(cornOrCent == 1){//we always compute rectangles from bottom left corner.  So to cut one thats centered on the xy we passed in, we simply pull that left corner back by l/2 and down by w/2
+     x -= (l/2); y-= (w/2);
+  }
+  
+  float centerPointX = x+(l/2);
+  float centerPointY = y+(w/2);
+  float currentX = x;
+  float currentY = y;
+  
+  boolean flag = false;
+  
+  while(currentX != centerPointX && currentY != centerPointY){
+    cutRectangle(currentX,currentY,l,w,inOut,2,z,toolR,tabSize,stepover);
+    currentX += (toolR*2);
+    currentY += (toolR*2);
+    l -= (toolR*4);
+    w -= (toolR*4);
+    if(l < 0){ l = 0;}
+    if(w < 0){ w = 0;}
+    if(currentX > centerPointX ){ currentX = centerPointX;}
+    if(currentY > centerPointY){ currentY = centerPointY; }
+    
+  }
+  println("feece");
+     F.plus("butt");
+  cutRectangle(centerPointX-(l/2)-toolR,centerPointY,l+(toolR*2),w,2,2,z,toolR,0,stepover); //finish off center
+  
+  F.plus("G01 Z" + (z+stepover));
+}
+
+void cutRectangle(float x, float y,float l, float w, int inOut, int cornOrCent, float z,  float toolR, float tabSize,float stepover){
+  
+  float modX = 0;
+  float modY = 0;
+  float a,b,hyp,theta;
+  
+  if(cornOrCent == 0){//coords indicatebottom left corner, offset circle position
+    
+  }
+  else if(cornOrCent == 1){
+     x -= (l/2); y -= (w/2);
+  }
+  else if(cornOrCent == 2){
+     //for rectangular face, its best for the main method to just tell this where to make it's bottom left corner, and not have this do anything.
+     //so wether that ends up being center or corner is determined in the rectangularFace method then passed here and done in corner mode
+  }
+  
+  //when inout is 0 we are cutting an ID rectangle.  When inout is 1 we're cutting an OD rectangle
+  //retangles always start from bottom left corner.
+  
+   if(tabSize == 0){
+     
+     if(inOut == 0){modX = toolR;modY = toolR; }else if(inOut == 1){modX = (toolR*-1); modY = (toolR*-1);}
+     F.plus("G01 X"+(x+modX) + " Y" + (y+modY));//inital positionning
+     F.plus("F"+plungeSpeed);
+     F.plus("G01 Z"+z);
+     F.plus("F"+normalSpeed);
+     if(inOut == 0){modX = toolR;modY = (toolR*-1); }else if(inOut == 1){modX = (toolR*-1); modY = (toolR);}
+     F.plus("G01 X"+(x+modX) + " Y" + (y+modY+w));
+     
+     if(inOut == 0){modX = (toolR*-1);modY = (toolR*-1); }else if(inOut == 1){modX = (toolR); modY = (toolR);}
+     F.plus("G01 X"+(x+modX+l) + " Y" + (y+modY+w));
+     
+     if(inOut == 0){modX = (toolR*-1);modY = toolR; }else if(inOut == 1){modX = (toolR); modY = (toolR*-1);}
+     F.plus("G01 X"+(x+modX+l) + " Y" + (y+modY));
+     
+     if(inOut == 0){modX = toolR;modY = toolR; }else if(inOut == 1){modX = (toolR*-1); modY = (toolR*-1);}
+     F.plus("G01 X"+(x+modX) + " Y" + (y+modY)); //return to start
+   }
+   else{
+     
+     //it's just easier to do this if our rectangle is defined in an array format
+     float[][] points = { {x,y},
+                          {x,y+w},
+                          {x+l,y+w},
+                          {x+l,y},
+                          {x,y},
+                         };
+  
+     float[][][] mods = {  { {1,1},{1,-1}, {-1,-1},{-1,1},{1,1} },  { {-1,-1},{-1,1},{1,1},{1,-1},{-1,-1}}  };
+     
+     for(int i = 0; i < 4; i++){
+       
+       a = abs((points[i+1][0]+(toolR*mods[inOut][i+1][0])) - (points[i][0]+toolR*mods[inOut][i][0]));
+       b = abs((points[i+1][1]+toolR*mods[inOut][i+1][1]) - (points[i][1]+toolR*mods[inOut][i][1]));
+       hyp = sqrt(pow(a,2) + pow(b,2));
+       theta = atan(b/a);
+       
+       if(points[i+1][0] < points[i][0]){ 
+              theta += PI;
+       }
+       else if(points[i+1][1] < points[i][1]){
+          theta += PI; 
+       }
+       
+       F.plus("G01 X"+(points[i][0]+(toolR*mods[inOut][i][0])) + " Y" + (points[i][1]+toolR*mods[inOut][i][1]));//inital positionning
+        F.plus("F"+plungeSpeed);
+        F.plus("G01 Z"+z);
+        F.plus("F"+normalSpeed);
+       
+       F.plus("G01 X"+ ze(((toolR*mods[inOut][i][0])+points[i][0] + (((hyp/2)-(tabSize/2))*cos(theta)))) + "Y" + ze(((toolR*mods[inOut][i][1])+points[i][1] + (((hyp/2)-(tabSize/2))*sin(theta)))));//over
+       F.plus("G01 Z" + (z+stepover));//up
+       F.plus("G01 X"+ ze(((toolR*mods[inOut][i][0])+points[i][0] + (((hyp/2)+(tabSize/2))*cos(theta)))) + "Y" + ze(((toolR*mods[inOut][i][1])+points[i][1] + (((hyp/2)+(tabSize/2))*sin(theta)))));//over
+        F.plus("F"+plungeSpeed);
+       F.plus("G01 Z"+z);//down
+       F.plus("F"+normalSpeed);
+       F.plus("G01 X"+ ((toolR*mods[inOut][i][0])+points[i+1][0]) + "Y" + ((toolR*mods[inOut][i][1])+points[i+1][1]) );//next point
+     
+     }
+   }
+}
+
+void cutCircle(int inOut,int cornOrCent,float xCent, float yCent, float z,  float r,float toolR,float tabAmount, float stepover,int speed){
+  //(tab amount is in degrees)
+ 
+  if(inOut == 0){
+    r -= toolR; //if r is referring to ID, SUBTRACT toolR
+  }
+  else if(inOut == 1){
+    r += toolR; //if r is referring to OD, ADD toolR
+  }
+  
+  if(cornOrCent == 0){//coords indicatebottom left corner, offset circle position
+     xCent += r; yCent += r;
+  }
+ 
+      F.plus("G01 " + "X"+fmt((cos(radians(180-tabAmount))*r) + xCent) + " Y"+ fmt((sin(radians(180-tabAmount))*r) + yCent)); //initial pos
+      F.plus("F" + speed);
+      F.plus("G02 X"+fmt((cos(radians(180-tabAmount))*r) + xCent) + " Y"+ fmt((sin(radians(180-tabAmount))*r) + yCent)  + " R" + r) ;
+      F.plus("F" + plungeSpeed);
+      F.plus("G01 Z"+z);
+      
+      F.plus("F" + speed);
+      F.plus("G02 " + "X"+fmt((cos(radians(90+tabAmount))*r) + xCent) + " Y"+ fmt((sin(radians(90+tabAmount))*r) + yCent) + " R" + r);
+      if(tabAmount == 0){F.plus("F" + plungeSpeed); F.plus("G01 Z"+z); } 
+      else{F.plus("G01 Z"+(z+stepover));}
+      F.plus("F" + speed);
+      F.plus("G02 " + "X"+fmt((cos(radians(90-tabAmount))*r) + xCent) + " Y"+ fmt((sin(radians(90-tabAmount))*r) + yCent) + " R" + r);
+      F.plus("F" + plungeSpeed);
+      F.plus("G01 Z"+z);
+      F.plus("F" + speed);
+      
+      F.plus("G02 " + "X"+fmt((cos(radians(0+tabAmount))*r) + xCent) + " Y"+ fmt((sin(radians(0+tabAmount))*r) + yCent) + " R" + r);
+      if(tabAmount == 0){F.plus("F" + plungeSpeed); F.plus("G01 Z"+z); } 
+      else{F.plus("G01 Z"+(z+stepover));}
+      F.plus("F" + speed);
+      F.plus("G02 " + "X"+fmt((cos(radians(360-tabAmount))*r) + xCent) + " Y"+ fmt((sin(radians(360-tabAmount))*r) + yCent) + " R" + r);
+      F.plus("F" + plungeSpeed);
+      F.plus("G01 Z"+z);
+      F.plus("F" + speed);
+      
+      F.plus("G02 " + "X"+fmt((cos(radians(270+tabAmount))*r) + xCent) + " Y"+ fmt((sin(radians(270+tabAmount))*r) + yCent) + " R" + r);
+      if(tabAmount == 0){F.plus("F" + plungeSpeed); F.plus("G01 Z"+z); } 
+      else{F.plus("G01 Z"+(z+stepover));}
+      F.plus("F" + speed);
+      F.plus("G02 " + "X"+fmt((cos(radians(270-tabAmount))*r) + xCent) + " Y"+ fmt((sin(radians(270-tabAmount))*r) + yCent) + " R" + r);
+      F.plus("F" + plungeSpeed);
+      F.plus("G01 Z"+z);
+      F.plus("F" + speed);
+      
+      F.plus("G02 " + "X"+fmt((cos(radians(180+tabAmount))*r) + xCent) + " Y"+ fmt((sin(radians(180+tabAmount))*r) + yCent) + " R" + r);
+      if(tabAmount == 0){F.plus("F" + plungeSpeed); F.plus("G01 Z"+z); } 
+      else{F.plus("G01 Z"+(z+stepover));}
+      F.plus("F" + speed);
+}
+
+float fmt(float n){
+   return parseFloat(nf(n,0,2));
+}
+
+float ze(float in){
+
+  if(in >= 0 && in < .01){
+    return 0; 
+  }
+  else if(in < 0 && in > -.01) {
+    return 0;
+  }
+  else{
+    return in; 
+  }
+}
+
+class OutputFile{
+  
+  String[] data;
+  int index;
+  
+  public OutputFile(int s){
+    data = new String[s]; 
+    index = 0;
+  }
+  public void plus(String s){
+    data[index] = s;
+    index++;
+  }
+  public void export(String name){
+    String[] output = new String[index];
+    
+    //otherwise the unfilled spaces in the original data array will print 'null' to the txt file.
+    for(int i = 0; i < index; i++){
+      output[i] = data[i];
+    }
+    
+    saveStrings(name, output);
+  }
+  public void reset(){
+    index = 0; 
+  }
 }
