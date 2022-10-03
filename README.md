@@ -1,9 +1,54 @@
 # ClickStack
-An open hardware/source Bluetooth foot pedal
 
-Build Instructions:
+### A beautiful, dirt cheap, open source mouse pedal. 
 
-First download Processing and run the ClickStackGenerator sketch.  Fiddle with the parameters to get the layout you want.  For most cases you probably just want to change the amount of buttons added in setup via addButton and their width using setButtonWidth.  There are a couple common layouts included which you can uncomment to use.
+ClickStack is ideal for activities that involve lots of clicking, such as graphic design, PCB layout, and video editing.  The cheapest available mouse pedals are typically around 50$ and bulky.  The cost of materials in a ClickStack can be as low as 10$, and your pedal can be designed to be as lightweight and compact as you want.  Provided are a Processing sketch which generates a design based on your parameters, and a basic Arduino sketch to let you dictate the messages your buttons will send.  The default sketch settings are for an Arduino Nano as the microcontroller but you can use whatever you want.
+
+## Build Instructions:
+
+There are 2 ways to build the physical pedal.  Either export Gcode files from the Processing sketch to run on a CNC router, or export a PNG template, print it out, and route everything by hand. 
+
+### Recommended Supplies List:
+
+- Microcontroller (Arduino Nano or ESP32 recommended)
+- Pine board, 1/2" (12.5mm) thick. 
+- Plastic sheet, 1/16" (1.5mm) thick.
+- 5mm tactile buttons
+- Button PCB ([Offical board on OSHPark](https://oshpark.com/shared_projects/baTaN6WL "Named link title"))
+- Foam sheet, 6mm thick.  
+- #4 wood screws
+- 26AWG wire (or similar)
+
+### Designing Your Pedal
+
+First [download Processing](https://oshpark.com/shared_projects/baTaN6WL "Named link title") and run the ClickStackGenerator sketch.  At the top of the sketch is a section called **'USER VALUES'**.  There are 3 different subsections of variables to fiddle with:
+- **'CNC MACHINE RELATED'** If you are going to go the CNC route, make sure to set all these values so that they are correct for your machine, especially the first 4 which are marked with '**'.  Ignore these if routing by hand.
+- **'TEMPLATE SCALE RELATED'** If your plan is to route by hand, make sure that the value for'sF' results in your PNG exporting at a 1:1 scale.  If it doesn't, raise or lower it accordingly.
+- **'DEFAULT PEDAL DESIGN RELATED'** These give you control over the basic dimensions of the pedal.  You can change things like the location of the usb jack, length of the pedals, overall depth of the pedal, etc.  You can probably leave these alone if you're unsure, aside from making sure the ones that begin with 'mcu' relfect the correct dimensions for your microcontroller.
+
+The basic concept of ClickStack is to stagger button stacks at different heights in order to make it easy to locate the button
+you want despite the buttons being very close to each other.  These heights are referred to as levels.  Level 0 buttons are sunk into the base itself, and higher level buttons get glued on.  Each successive level adds an extra height of whatever your 'woodStockT' value is set to.  To add buttons to your design, do clickStack.addButton(level) in the order that you want them to be located on the pedal going from left to right:<br/>
+```
+clickStack.addButton(0); //this button is the leftmost, since it's the first added, and its level is 0
+clickStack.addButton(1); //middle button
+clickStack.addButton(2); //the last button added is the rightmost, and its level is 2
+```
+
+The above example creates a simple pedal with equally-sized buttons increasing in height from left to right.  If you want different widths for your buttons, you can use clickStack.setButtonWidth(button ID).  The button ID is automatically determined by the order you add the buttons, with first/leftmost being 0.
+Here is a 5 button pedal with a larger middle button:
+```
+clickStack.addButton(2); //the buttons ID depends on the order you add them, this is button 0
+clickStack.addButton(1); //button 1
+clickStack.addButton(0); // button 2
+clickStack.addButton(1); // button 3
+clickStack.addButton(2); //button 4
+clickStack.setButtonWidth(0,25);//use button ID followed by value
+clickStack.setButtonWidth(1,45);
+clickStack.setButtonWidth(2,120);
+clickStack.setButtonWidth(3,45);
+clickStack.setButtonWidth(4,25);
+  ```
+The above example creates a design with a large base-level button in the center, bigger buttons on either side of it one level higher, and the smaller buttons on the far left and right another level hgiher.
 
 Template: If you want a template during the build process, press 'p' in the processing sketch to export a PNG of your design which you can then print. Measure your printout to ensure the scale is correct.  If not, change 'sF' in the sketch to modify the scale factor up or down.
 
