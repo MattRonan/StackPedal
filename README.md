@@ -97,7 +97,7 @@ At this point you can use a thin layer of silicone or other adhesive to glue a s
 
 ### Software:
 
-First of all, there are a few options for how the StackPedal actually interfaces with a computer:
+There are a few options for how the StackPedal actually interfaces with a computer:
 
 A) The simplest is to use something like an Arduino Nano and the default Arduino Mouse library, with a usb cable providing both power and data connection.  In the StackPedalGenerator sketch, an Elegoo Arduino Nano is used for the mcu pocket size and usb jack location. 
 
