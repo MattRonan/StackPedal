@@ -73,8 +73,8 @@ Run job3 to cutout the plastic top cover panel and the usb panel
 
 **By Hand Method:**
 
-This requires a little more elbow grease but it's how I made the first prototype, which only took a few hours.
-Print a template and use it to mark your parts.  You want to cut out the buttons first and glue up your stacks.
+This requires a little more elbow grease than the cnc method but it's how I made the first prototype, which only took a few hours.
+Print a template and use it to mark your parts.  You want to saw out the buttons first and glue up your stacks.
 Now you'll need a dremel.  A trick for getting accurate depths by hand is to snap a drill bit in half so its short enough to stick only a few mm out of the chuck of a hand drill, and then set it to the exact depth you want for a given section.  Then just quickly sink a bunch of holes in that area.  Now when you dremel, you just need to erase the holes and you'll end up with a relatively even and correct depth.  Mark and route all pockets and wire tracks.
 
 For cutting out the plastic panels, scissors or shears work fine.  
