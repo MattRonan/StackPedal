@@ -22,31 +22,32 @@ There are 2 ways to build the physical pedal.  Either export Gcode files from th
 
 ### Designing the Pedal
 
-First [download Processing](https://oshpark.com/shared_projects/baTaN6WL "Named link title") and run the StackPedalGenerator sketch.  At the top of the sketch is a section called **'USER VALUES'**.  There are 3 different subsections of variables to fiddle with:
+First [download Processing](https://oshpark.com/shared_projects/baTaN6WL "Named link title") and run the StackPedalGenerator sketch.  At the top of the sketch is a section called **'USER VALUES'**.  There are 4 different subsections of variables to fiddle with:
 - **'CNC MACHINE RELATED'** If you are going to go the CNC route, make sure to set all these values so that they are correct for your machine, especially the first 4 which are marked with '**'.  Ignore these if routing by hand.
 - **'TEMPLATE SCALE RELATED'** If your plan is to route by hand, make sure that the value for'sF' results in your PNG exporting at a 1:1 scale.  If it doesn't, raise or lower it accordingly.
-- **'DEFAULT PEDAL DESIGN RELATED'** These give you control over the basic dimensions of the pedal.  You can change things like the location of the usb jack, length of the pedals, overall depth of the pedal, etc.  You can probably leave these alone if you're unsure, aside from making sure the ones that begin with 'mcu' relfect the correct dimensions for your microcontroller.
+- **'UNIVERSAL DESIGN RELATED'** These give you control over the basic dimensions of the pedal.  You can change things like the location of the usb jack, length of the pedals, overall depth of the pedal, etc.  You can probably leave these alone if you're unsure, aside from making sure the ones that begin with 'mcu' relfect the correct dimensions for your microcontroller.
+- **'PER BUTTON DESIGN RELATED'** These can be changed indivudually for each button stack.  
 
-Now you can work on the button layout.  The basic concept of StackPedal is to stagger button stacks at different heights in order to make it easy hit the correct button with your foot despite everything being very compact.  These heights are referred to as levels.  Level 0 buttons are sunk into the base itself, and higher level buttons get glued on.  Each successive level adds an extra height of whatever your 'woodStockT' value is set to.  To add buttons to your design, do stackPedal.addButton(level) in the order that you want them to be located on the pedal going from left to right:<br/>
+Now you can work on the button layout.  The basic concept of StackPedal is to stagger button stacks at different heights in order to make it easy hit the correct button with your foot despite everything being very compact.  These heights are referred to as levels.  Level 0 buttons are sunk into the base itself, and higher level buttons get glued on.  Each successive level adds an extra height of whatever your 'woodStockT' value is set to.  To add buttons to your design, do pedalManager.addButton(level) in the order that you want them to be located on the pedal going from left to right:<br/>
 ```
-stackPedal.addButton(0); //this button is the leftmost, since it's the first added, and its level is 0
-stackPedal.addButton(1); //middle button
-stackPedal.addButton(2); //the last button added is the rightmost, and its level is 2
+pedalManager.addButton(0); //this button is the leftmost, since it's the first added, and its level is 0
+pedalManager.addButton(1); //middle button
+pedalManager.addButton(2); //the last button added is the rightmost, and its level is 2
 ```
 
 The above example creates a simple pedal with 3 equally-sized buttons increasing in height from left to right.  If you want different widths for your buttons, you can use stackPedal.setButtonWidth(button ID).  The button ID is automatically determined by the order you add the buttons, with first/leftmost being 0.
 The  next example creates a design with 1 large base-level button in the center, 2 bigger buttons on either side of it one level higher, and 2 smaller buttons on the far left and right another level higher.
 ```
-stackPedal.addButton(2); //the buttons ID depends on the order you add them, this is button 0
-stackPedal.addButton(1); //button 1
-stackPedal.addButton(0); //button 2
-stackPedal.addButton(1); //button 3
-stackPedal.addButton(2); //button 4
-stackPedal.setButtonWidth(0,25); //use button ID followed by value
-stackPedal.setButtonWidth(1,45);
-stackPedal.setButtonWidth(2,120);
-stackPedal.setButtonWidth(3,45);
-stackPedal.setButtonWidth(4,25);
+pedalManager.addButton(2); //the buttons ID depends on the order you add them, this is button 0
+pedalManager.addButton(1); //button 1
+pedalManager.addButton(0); //button 2
+pedalManager.addButton(1); //button 3
+pedalManager.addButton(2); //button 4
+pedalManager.setButtonWidth(0,25); //use button ID followed by value
+pedalManager.setButtonWidth(1,45);
+pedalManager.setButtonWidth(2,120);
+pedalManager.setButtonWidth(3,45);
+pedalManager.setButtonWidth(4,25);
   ```
 
 You may also want to change the position of the MCU, which in turn impacts the position of USB jack.  The jack can be on either the left, back, or right walls of the pedal, and you can choose the wall as well as the relative position on that wall with the following 2 variables:
