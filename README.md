@@ -50,7 +50,7 @@ pedalManager.setButtonWidth(3,45);
 pedalManager.setButtonWidth(4,25);
   ```
 
-You may also want to change the position of the MCU, which in turn impacts the position of USB jack.  The jack can be on either the left, back, or right walls of the pedal, and you can choose the wall as well as the relative position on that wall with the following 2 variables:
+You may also want to change the position of the MCU, which in turn impacts the position of the USB jack.  The jack can be on either the left, back, or right walls of the pedal, and you can choose the wall as well as the relative position on that wall with the following 2 variables:
 
 ```
 int mcuJackWall = 1;   //0 = left side, 1 = back side, 2 = right side 
