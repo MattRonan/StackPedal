@@ -1,9 +1,9 @@
 /* StackPedal Generator
    2022 Matt Ronan
-   https://github.com/MattRonan/StackPedalManager
+   https://github.com/MattRonan/StackPedal
    
    A program to generate gcode and a printable template
-   For a custom StackPedalManager build.
+   for a custom StackPedal.
   
    *Be sure to set the values in the 'USER VALUES' box below*
    
@@ -36,7 +36,7 @@ float stepover = 2;         //default stepover
 //----TEMPLATE SCALE RELATED
 float sF = 5.25;//scale factor of the pixels for the drawing of the design. depnding on your screen it may not be equally accurate in BOTH x and y.  TODO, a way to export a png thats unit-based instead of using saveFrame?
 
-//UNIVERSAL DESIGN SETTINGS
+//----UNIVERSAL DESIGN SETTINGS
 float baseHeight = 125; //the dimension of the base measured parallel to the pedals. ie this minus stackL is how much space is left for the microcontroller area.
 float mcuW = 17.5; //the width of your microcontroller.  These dimensions are an Elegoo Arduino Nano
 float mcuL = 43;//the length of your microcontroller. 
@@ -59,8 +59,8 @@ float ledgeClearance = 6; //distance out from top side of pedal to carve straigh
 float stackL = 72; //length of button stacks.  
 float stackLedgeW = 15; //plastic presser panel screws into here. 15mm is usually fine.
 
-//PER-STACK DESIGN SETTINGS
-//these can be customized per button stack in setup below
+//----PER-STACK DESIGN SETTINGS
+//(these can be customized per button stack in setup below)
 float defaultStackW = 43; //if you want to make a stack wider, say 1 wide middle stack and 2 thinner outers, you can set them individually after this
 float defaultStackMargin = 2; //margin between stacks.  Doesnt get applied to the 2 outside edges.  
 float defaultFoamThickness = 6.0; //foam slot width.  This is set to use 6mm foam that you can find at Michaels or online.
