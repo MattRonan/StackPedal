@@ -22,7 +22,7 @@ There are 2 ways to build the physical pedal.  Either export Gcode files from th
 
 ### Designing the Pedal
 
-First [download Processing](https://oshpark.com/shared_projects/baTaN6WL "Named link title") and run the StackPedalGenerator sketch.  At the top of the sketch is a section called **'USER VALUES'**.  There are 4 different subsections of variables to fiddle with:
+First [download Processing](https://processing.org/download "Named link title") and run the StackPedalGenerator sketch.  At the top of the sketch is a section called **'USER VALUES'**.  There are 4 different subsections of variables to fiddle with:
 - **'CNC MACHINE RELATED'** If you are going to go the CNC route, make sure to set all these values so that they are correct for your machine, especially the first 4 which are marked with '**'.  Ignore these if routing by hand.
 - **'TEMPLATE SCALE RELATED'** If your plan is to route by hand, make sure that the value for 'sF' results in your PNG exporting at a 1:1 scale.  If it doesn't, raise or lower it accordingly.
 - **'UNIVERSAL DESIGN RELATED'** These give you control over the basic dimensions of the pedal.  You can change things like the location of the usb jack, length of the pedals, overall depth of the pedal, etc.  You can probably leave these alone if you're unsure, aside from making sure the ones that begin with 'mcu' relfect the correct dimensions for your microcontroller.
@@ -63,13 +63,13 @@ float mcuJackPos = .5; //shift jack on selected wall by inputting a value from 0
 
 Press 'g' in the processing sketch to export gcode once you've finished your design.  It will output 4 separate .nc files, job0, job1, job2, and job3.
 
-Run job0 to cut out the base. Make sure you export your design with the correct toolR and woodStockT values.  A 3mm bit or smaller is recommended.   Level 0 buttons get cut into the base itself.  
+Run job0 to cut out the base. Make sure you export your design with the correct toolR and woodStockT values.  A 3mm bit is recommended.   Level 0 buttons get cut into the base itself.  
 
 Run job1 to cut out the higher level buttons.
 
 Glue higher level buttons to base. 
 
-Run job2 to cutout plastic presser panels.  I use 1.5mm thick ABS plastic.  Thicker than that and it may not flex right, but thinner and it may flex too much.  CNC cutting plastic can be tricky; typically you need to screw it into a piece of backing wood to get enough height to use your clamps.
+Run job2 to cutout plastic presser panels.  1.5mm thick ABS plastic is ideal. Thicker and it may not flex right, but thinner and it may flex too much.  
 
 Run job3 to cutout the plastic top cover panel and the usb panel
 
@@ -77,17 +77,17 @@ Run job3 to cutout the plastic top cover panel and the usb panel
 
 This requires a little more elbow grease than the cnc method but it's how I made the first prototype, which only took a few hours.
 Print a template and use it to mark your parts.  You want to saw out the buttons first and glue up your stacks.
-Now you'll need a dremel.  A trick for getting accurate depths by hand is to snap a drill bit in half so its short enough to stick only a few mm out of the chuck of a hand drill, and then set it to the exact depth you want for a given section.  Then just quickly sink a bunch of holes in that area.  Now when you dremel, you just need to erase the holes and you'll end up with a relatively even and correct depth.  Mark and route all pockets and wire tracks.
+Now you'll need a dremel.  A trick for getting accurate depths by hand is to snap a drill bit in half so its short enough to stick only a few mm out of the chuck of a hand drill, and then set it to the exact depth you want for a given section.  Then just quickly sink a bunch of holes in that area.  Now when you dremel, you just need to erase the holes and you'll end up with a relatively even and correct depth.  Route all pockets and wire tracks.
 
 For cutting out the plastic panels, scissors or shears work fine.  
 
 **Both Methods:**
 
-Now you should have the full base + button stacks glued up, routed, and all plastic panels cut out.  The next step is to connect the higher level wire tracks to the tracks routed in the base by drilling diagonally down to create a tunnel.  Typically a 1/8 bit works well for this for most wires.
+Now you should have the full base + button stacks glued up, routed, and all plastic panels cut out.  The next step is to connect the higher level wire tracks to the tracks routed in the base by drilling diagonally down to create a tunnel.  Typically a 1/8 bit works well for most wires.
 
 ### Wiring and Finishing the Pedal
 
-Wire up the buttons to either some protoboard or get the official button pcb at https://oshpark.com/shared_projects/baTaN6WL
+Wire up the buttons to either some protoboard or the official button pcb https://oshpark.com/shared_projects/baTaN6WL
 Using the pcb is a better option because you can avoid needing screws to hold it in place since it's a perfect fit.  You can achieve the same thing with protoboard if you take the time to dial it in.  Make your connections to the microcontroller.
 
 Cut a strip of foam to sit into the foam cutout for each panel.  For a stiffer button feel, fill up the whole slot.  For an easier to press one use
