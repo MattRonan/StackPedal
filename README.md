@@ -35,7 +35,7 @@ pedalManager.addButton(1); //middle button
 pedalManager.addButton(2); //the last button added is the rightmost, and its level is 2
 ```
 
-The above example creates a simple pedal with 3 equally-sized buttons increasing in height from left to right.  If you want different widths for your buttons, you can use stackPedal.setButtonWidth(button ID).  The button ID is automatically determined by the order you add the buttons, with first/leftmost being 0.
+The above example creates a simple pedal with 3 equally-sized buttons increasing in height from left to right.  If you want different widths for your buttons, you can use pedalManager.setButtonWidth(button ID).  The button ID is automatically determined by the order you add the buttons, with first/leftmost being 0.
 The  next example creates a design with 1 large base-level button in the center, 2 bigger buttons on either side of it one level higher, and 2 smaller buttons on the far left and right another level higher.
 ```
 pedalManager.addButton(2); //the buttons ID depends on the order you add them, this is button 0
