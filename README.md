@@ -24,9 +24,9 @@ There are 2 ways to build the physical pedal.  Either export Gcode files from th
 
 First [download Processing](https://oshpark.com/shared_projects/baTaN6WL "Named link title") and run the StackPedalGenerator sketch.  At the top of the sketch is a section called **'USER VALUES'**.  There are 4 different subsections of variables to fiddle with:
 - **'CNC MACHINE RELATED'** If you are going to go the CNC route, make sure to set all these values so that they are correct for your machine, especially the first 4 which are marked with '**'.  Ignore these if routing by hand.
-- **'TEMPLATE SCALE RELATED'** If your plan is to route by hand, make sure that the value for'sF' results in your PNG exporting at a 1:1 scale.  If it doesn't, raise or lower it accordingly.
+- **'TEMPLATE SCALE RELATED'** If your plan is to route by hand, make sure that the value for 'sF' results in your PNG exporting at a 1:1 scale.  If it doesn't, raise or lower it accordingly.
 - **'UNIVERSAL DESIGN RELATED'** These give you control over the basic dimensions of the pedal.  You can change things like the location of the usb jack, length of the pedals, overall depth of the pedal, etc.  You can probably leave these alone if you're unsure, aside from making sure the ones that begin with 'mcu' relfect the correct dimensions for your microcontroller.
-- **'PER BUTTON DESIGN RELATED'** These can be changed indivudually for each button stack.  
+- **'PER BUTTON DESIGN RELATED'** These can be set indivudually for each button stack.
 
 Now you can work on the button layout.  The basic concept of StackPedal is to stagger button stacks at different heights in order to make it easy hit the correct button with your foot despite everything being very compact.  These heights are referred to as levels.  Level 0 buttons are sunk into the base itself, and higher level buttons get glued on.  Each successive level adds an extra height of whatever your 'woodStockT' value is set to.  To add buttons to your design, do pedalManager.addButton(level) in the order that you want them to be located on the pedal going from left to right:<br/>
 ```
