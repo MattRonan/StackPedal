@@ -87,10 +87,10 @@ Now you should have the full base + button stacks glued up, routed, and all plas
 
 ### Wiring and Finishing the Pedal
 
-Wire up the buttons to either some protoboard or the official button pcb [download Processing](https://oshpark.com/shared_projects/baTaN6WL "Named link title")
-Using the pcb is a better option because you can avoid needing screws to hold it in place since it's a perfect fit.  You can achieve the same thing with protoboard if you take the time to dial it in.  Make your connections to the microcontroller.
+Wire up the buttons to either some protoboard or the [official button pcb](https://oshpark.com/shared_projects/baTaN6WL "Named link title")
+Using the pcb is a better option because the tight fits means no need for screws.  You can achieve the same thing with protoboard if you take the time to dial it in.  Make your connections to the microcontroller.
 
-Cut a strip of foam to sit into the foam cutout for each panel.  For a stiffer button feel, fill up the whole slot.  For an easier to press one use
+Cut a strip of 6mm foam to sit into the foam cutout for each panel.  For a stiffer button feel, fill up the whole slot.  For an easier to press one use
 a shorter piece.  You dont have to add foam at all but the button will be extremely clicky and will probably wear out sooner.
 
 Use a hand drill to make pilot holes for all the plastic panels and connect them with #4 wood screws.
@@ -110,9 +110,8 @@ C)  ESP32 or other mcu with built-in Bluetooth, using a battery pack (rechargeab
 For options B and C, T-vK made a great BLE mouse library for the ESP32 which can be found at https://github.com/T-vK/ESP32-BLE-Mouse 
 
 If using the default Arduino Nano approach, use the "non-Bluetooth" sketch to set your buttons to send the commands that you want.
-For ESP32, use the "ESP32_BLE" sketch. 
+For ESP32, use the "ESP32_BLE" sketch. These have options for left, right, and middle clicks, plus scrolling up and down but more are possible.  The StackPedal can also be used to send keyboard strokes for foot-controlled hotkeys.
 
-If you don't want to go through the process of making your own StackPedal, I sell them over at Etsy for less $ than the typical Amazon pedals.
 
 
 
