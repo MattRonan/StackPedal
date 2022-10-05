@@ -22,7 +22,7 @@ There are 2 ways to build the physical pedal.  Either export Gcode files from th
 
 ### Designing the Pedal
 
-![StackPedalGeneratorScreenGrabs3Stack](https://user-images.githubusercontent.com/11184076/194175564-0c1a8480-e03e-4e1d-b356-deb1a73de94b.png)
+![StackPedalGeneratorScreenGrabs3Stack](https://user-images.githubusercontent.com/11184076/194176268-86054d92-8e45-4d1b-9a6a-041afb285fb4.png)
 
 First [download Processing](https://processing.org/download "Named link title") and open the StackPedalGenerator sketch.  At the top of the sketch is a section called **'USER VALUES'**.  There are 4 different subsections of variables to fiddle with:
 - **'CNC MACHINE RELATED'** If you are going to go the CNC route, make sure to set all these values so that they are correct for your machine, especially the first 4 which are marked with '**'.  Ignore these if routing by hand.
