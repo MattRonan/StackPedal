@@ -67,9 +67,9 @@ Press 'g' in the processing sketch to export gcode once you've finished your des
 
 Run job0 to cut out the base. Make sure you export your design with the correct toolR and woodStockT values.  A 3mm bit is recommended.   Level 0 buttons get cut into the base itself.  
 
-Run job1 to cut out the higher level buttons.
+Run job1 to cut out the higher level button stacks.
 
-Glue higher level buttons to base. 
+Glue higher level stacks to base. 
 
 Run job2 to cutout plastic presser panels.  1.5mm thick ABS plastic is ideal. Thicker and it may not flex right, but thinner and it may flex too much.  
 
