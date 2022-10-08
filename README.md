@@ -20,7 +20,7 @@ There are 2 ways to build the physical pedal.  Either export Gcode files from th
 - #4 wood screws
 - 26AWG wire (or similar)
 
-### Designing the Pedal
+### Designing the Pedal With StackPedalGenerator
 
 ![Classic3StackDiagram](https://user-images.githubusercontent.com/11184076/194709257-098e2597-f47f-4a00-bd6d-ce763a41a467.jpg)
 
