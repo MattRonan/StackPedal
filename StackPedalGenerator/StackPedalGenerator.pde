@@ -129,7 +129,7 @@ void setup() {
   pedalManager.addButton(1); //the buttons ID depends on the order you add them
   pedalManager.setButtonWidth(0,115);//use button ID followed by value
   */
-   size(1500, 800);
+   size(1450, 800);
 
   
 }
@@ -556,6 +556,8 @@ void exportGCode(){
    F.plus("G01 Z2");
    F.plus("G00 F" + normalSpeed);
    
+   float level0PresserPanelClearance = 2; //this is an extra area around level 0 buttons, to make sure the presser panel doesn't get hung up on the walls 
+   
    //level 0 button related
    for(int i = 0; i < pedalManager.numButtons; i++){
    
@@ -564,7 +566,7 @@ void exportGCode(){
        //general relief to leave a ledge
        for(float z = 0; z >= otherReliefDepth*-1; z -= normalStep){
                                                          //note for level0 buttons, we cut it wider than the outline dictates (hence the defaultStackMargin subtraction and then increasing W by margin*2) cause otherwise the presser panel would get hung up on the wood.  Not a problem for higher level buttons.
-         rectangularFace((pedalManager.buttons[i].x) + 0-pedalManager.buttons[i].stackMargin, ((pedalManager.buttons[i].y+stackLedgeW))*invY  , pedalManager.buttons[i].stackW + (pedalManager.buttons[i].stackMargin*2),(stackL-stackLedgeW)*invY,in,corner,z,toolR,stepover,normalSpeed );
+         rectangularFace((pedalManager.buttons[i].x) - level0PresserPanelClearance, ((pedalManager.buttons[i].y+stackLedgeW))*invY  , pedalManager.buttons[i].stackW + (level0PresserPanelClearance*2),(stackL-stackLedgeW)*invY,in,corner,z,toolR,stepover,normalSpeed );
        }
        
        tabSize = 0;
