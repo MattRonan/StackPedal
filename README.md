@@ -132,10 +132,10 @@ An example list of materials and their source, with base cost followed by approx
 - Arduino Nano (Offbrand), Amazon, pack of three:  $20, 1 x $6.33
 - Pine board, Lowes, 1/2" thick 3ft long: $5, approx $2.50 per
 - Plastic sheet, Amazon, 1/16" thick: $8, $4 per 
-- 5mm tactile buttons, Amazon, pack of 100: $6, 3 x $.06 (I hate Amazon but it's hard not to buy things priced like this)
+- 5mm tactile buttons, Amazon, pack of 100: $6, 3 x $0.06 (I hate Amazon but it's hard not to buy things priced like this)
 - Button PCB ([Official board on OSHPark](https://oshpark.com/shared_projects/baTaN6WL "Named link title")) $1.65 for 3
-- Foam sheet, 6mm thick, Michaels, $1, $.1 per
-- Foam sheet, 2mm thick, Michaels, $1, $.50 per
+- Foam sheet, 6mm thick, Michaels, $1, approx $0.1 per
+- Foam sheet, 2mm thick, Michaels, $1, approx $0.50 per
 - #4 wood screws, Lowes, 2 x packs of 8: $3.00
 
 Total cost if you have to buy all of these things is $45.65.  But the per pedal cost is a maximum of $18.26.  It goes down more if you buy a bigger pack of screws, a bigger sheet of plastic, etc.  I'm not including other odds and ends like wire, solder, adhesive, polyurethane, brushes etc.  
