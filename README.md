@@ -2,7 +2,7 @@
 
 ### A beautiful, dirt cheap, open source mouse pedal. 
 
-StackPedal is ideal for activities that involve lots of clicking, such as graphic design, PCB layout, and video editing.  The cheapest available mouse pedals are typically around 50$ and bulky.  The cost of materials in a StackPedal can be as low as 10$, and your pedal can be designed to be as lightweight and compact as you want.  Provided are a Processing sketch which generates a design based on your parameters, and a basic Arduino sketch to let you dictate the messages your buttons will send.  The default sketch settings are for either an Arduino Nano or ESP32 as the microcontroller but you can use whatever you want.
+StackPedal is ideal for activities that involve lots of clicking or scrolling, such as graphic design, CAD, video editing, and copyediting.  The cheapest available mouse pedals are typically around 50$ and bulky.  With StackPedal you can have a compact, lightweight design with however many buttons you need for about 10$.  Provided are a Processing sketch which generates a design based on your parameters, and a basic Arduino sketch to let you dictate the messages your buttons will send.  The default sketch settings are for either an Arduino Nano or ESP32 as the microcontroller but you can use whatever you want.
 
 # Build Instructions:
 
@@ -16,7 +16,7 @@ There are 2 ways to build the physical pedal.  Either export Gcode files from th
 - 5mm tactile buttons
 - Button PCB ([Official board on OSHPark](https://oshpark.com/shared_projects/baTaN6WL "Named link title"))
 - Foam sheet, 6mm thick 
-- Foam sheet, 2mm thick 
+- Foam sheet, 2mm thick (or adhesive non-slip backing)
 - #4 wood screws
 - 26AWG wire (or similar)
 
@@ -107,7 +107,7 @@ a shorter piece.  You dont have to add foam at all but the button will be extrem
 
 Use a hand drill to make 1/16" pilot holes for all the plastic panels and connect them with #4 wood screws.
 
-At this point you can use a thin layer of silicone or other adhesive to glue a sheet of foam to the bottom of the pedal to increase friction with the floor.
+At this point you want to put some kind of grippy backing onto the bottom of the pedal.  The cheapest option is standard 2mm craft foam and some kind of adhesive such as hardware store silisone.  You could also try adhesive-backed tapes or furniture sliders, which will probably provide better grip at higher cost.
 
 ### Software:
 
