@@ -22,7 +22,7 @@ There are 2 ways to build the physical pedal.  Either export Gcode files from th
 
 ### Designing the Pedal
 
-![StackPedalGeneratorScreenGrabs3Stack](https://user-images.githubusercontent.com/11184076/194176268-86054d92-8e45-4d1b-9a6a-041afb285fb4.png)
+![Classic3StackDiagram](https://user-images.githubusercontent.com/11184076/194709257-098e2597-f47f-4a00-bd6d-ce763a41a467.jpg)
 
 First [download Processing](https://processing.org/download "Named link title") and open the StackPedalGenerator sketch.  At the top of the sketch is a section called **'USER VALUES'**.  There are 4 different subsections of variables to fiddle with:
 - **'CNC MACHINE RELATED'** If you are going to go the CNC route, make sure to set all these values so that they are correct for your machine, especially the first 4 which are marked with '**'.  Ignore these if routing by hand.
@@ -69,8 +69,6 @@ Run job0 to cut out the base. Make sure you export your design with the correct 
 
 Run job1 to cut out the higher level button stacks.
 
-Glue higher level stacks to base. 
-
 Run job2 to cutout plastic presser panels.  1.5mm thick ABS plastic is ideal. Thicker and it may not flex right, but thinner and it may flex too much.  
 
 Run job3 to cutout the plastic top cover panel and the usb panel
@@ -78,14 +76,25 @@ Run job3 to cutout the plastic top cover panel and the usb panel
 **By Hand Method:**
 
 This requires a little more elbow grease than the cnc method but it's how I made the first prototype, which only took a few hours.
-Print a template and use it to mark your parts.  You want to saw out the buttons first and glue up your stacks.
-Now you'll need a dremel.  A trick for getting accurate depths by hand is to snap a drill bit in half so its short enough to stick only a few mm out of the chuck of a hand drill, and then set it to the exact depth you want for a given section.  Then just quickly sink a bunch of holes in that area.  Now when you dremel, you just need to erase the holes and you'll end up with a relatively even and correct depth.  Route all pockets and wire tracks.
+Print a template and use it to mark your parts.  Carefully saw everything out and route the pockets and wire tracks. A trick for getting accurate depths by hand is to snap a drill bit in half so its short enough to stick only a few mm out of the chuck of a hand drill, and then set it to the exact depth you want for a given section.  Then just quickly sink a bunch of holes in that area.  Now when you dremel, you just need to erase the holes and you'll end up with a relatively even and correct depth.  It may help to glue up the button stacks before routing (see photos below) so that you have a bigger object which is easier to clamp down.
 
 For cutting out the plastic panels, scissors or shears work fine.  
 
 **Both Methods:**
 
-Now you should have the full base + button stacks glued up, routed, and all plastic panels cut out.  The next step is to connect the higher level wire tracks to the tracks routed in the base by drilling diagonally down to create a tunnel.  Typically a 1/8 bit works well for most wires.
+You now should have all your wooden parts cut and routed.
+
+All wooden parts for a 3-stack pedal ready for gluing:
+![AllWoodenParts](https://user-images.githubusercontent.com/11184076/194709312-8ccc57ca-bd32-420a-b293-44cc3b8276b4.jpg)
+
+Stacks glued to base:
+![gluedStacks](https://user-images.githubusercontent.com/11184076/194709350-ee8aec3d-d0d6-4c07-8790-e6ef6b2a4e07.jpg)
+
+The next step is to connect the higher level wire tracks to the tracks routed in the base by drilling diagonally down to create a tunnel.  Typically a 1/8 bit works well for most wires:
+![DrillChannelBetweenStackAndBase](https://user-images.githubusercontent.com/11184076/194709375-d7ec4cb2-669f-4f45-b680-b4775ba5ba58.jpg)
+
+
+
 
 ### Wiring and Finishing the Pedal
 
