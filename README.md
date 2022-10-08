@@ -2,7 +2,7 @@
 
 ### A beautiful, dirt cheap, open source mouse pedal. 
 
-StackPedal is ideal for activities that involve lots of clicking or scrolling, such as graphic design, CAD, video editing, and copyediting.  The cheapest available mouse pedals are typically around 50$ and bulky.  With StackPedal you can have a compact, lightweight design with however many buttons you need for about 10$.  Provided are a Processing sketch which generates a design based on your parameters, and a basic Arduino sketch to let you dictate the messages your buttons will send.  The default sketch settings are for either an Arduino Nano or ESP32 as the microcontroller but you can use whatever you want.
+StackPedal is ideal for activities that involve lots of clicking or scrolling, such as graphic design, CAD, video editing, and copyediting.  The cheapest available mouse pedals are typically around 50$ and bulky.  With StackPedal you can have a compact, lightweight design with however many buttons you need for under 20$ (see price notes at very bottom).  Provided are a Processing sketch which generates a design based on your parameters, and a basic Arduino sketch to let you dictate the messages your buttons will send.  The default sketch settings are for either an Arduino Nano or ESP32 as the microcontroller but you can use whatever you want.
 
 # Build Instructions:
 
@@ -125,6 +125,18 @@ If using the default Arduino Nano approach, use the "non-Bluetooth" sketch to se
 For ESP32, use the "ESP32_BLE" sketch. These have options for left, right, and middle clicks, plus scrolling up and down but more are possible.  The StackPedal can also be used to send keyboard strokes for foot-controlled hotkeys.
 
 
+### Price Notes
 
+An example list of materials and their source, with base cost followed by approximate actual cost for the 3-stack pedal shown in construction photos.  
 
+- Arduino Nano (Offbrand), Amazon, pack of three:  $20, 1 x $6.33
+- Pine board, Lowes, 1/2" thick 3ft long: $5, about $2.50 per
+- Plastic sheet, Amazon, 1/16" thick: $8, $4 per 
+- 5mm tactile buttons, Amazon, pack of 100: $6, 3 x $.06 (I hate Amazon but it's hard not to buy things priced like this)
+- Button PCB ([Official board on OSHPark](https://oshpark.com/shared_projects/baTaN6WL "Named link title")) $1.65 for 3
+- Foam sheet, 6mm thick, Michaels, $1, about $.1 per
+- Foam sheet, 2mm thick, Michaels, $1, about $.50 per
+- #4 wood screws, Lowes, 2 x packs of 8: $3.00
+
+Total cost if you have to buy all of these things is $45.65.  But the per pedal cost is a maximum of $18.26.  It goes down more if you buy a bigger pack of screws, a bigger sheet of plastic, etc.  I'm not including other odds and ends like wire, solder, adhesive, polyurethane, brushes etc.  
 
