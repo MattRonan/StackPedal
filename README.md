@@ -26,8 +26,8 @@ There are 2 ways to build the physical pedal.  Either export Gcode files from th
 
 First [download Processing](https://processing.org/download "Named link title") and open the StackPedalGenerator sketch.  At the top of the sketch is a section called **'USER VALUES'**.  There are 4 different subsections of variables to fiddle with:
 - **'CNC MACHINE RELATED'** If you are going to go the CNC route, make sure to set all these values so that they are correct for your machine, especially the first 4 which are marked with '**'.  Ignore these if routing by hand.
-- **'TEMPLATE SCALE RELATED'** If your plan is to route by hand, make sure that the value for 'sF' results in your PNG exporting at a 1:1 scale.  If it doesn't, raise or lower it accordingly.
-- **'UNIVERSAL DESIGN RELATED'** These give you control over the basic dimensions of the pedal.  You can change things like the location of the usb jack, length of the pedals, overall depth of the pedal, etc.  You can probably leave these alone if you're unsure, aside from making sure the ones that begin with 'mcu' relfect the correct dimensions for your microcontroller.
+- **'TEMPLATE SCALE RELATED'** This changes the on-screen scale of the pedal and consequently the scale of the PDF that you export.  Getting a perfectly scaled printout can take some trial and error.  It may be easiest to leave this at the default value and then fine tune the scale from the print dialog of your PDF viewer. 
+- **'UNIVERSAL DESIGN RELATED'** These give you control over the basic dimensions of the pedal.  You can change things like the location of the usb jack, length of the pedals, overall depth of the pedal, etc.  You can probably leave most of these alone if you're unsure, but make sure the ones that begin with 'mcu' relfect the correct dimensions for your microcontroller.
 - **'PER BUTTON DESIGN RELATED'** These can be set indivudually for each button stack.
 
 Now you can work on the button layout.  The basic concept of StackPedal is to stagger button stacks at different heights in order to make it easy hit the correct button with your foot despite everything being very compact.  These heights are referred to as levels.  Level 0 buttons are sunk into the base itself, and higher level buttons get glued on.  Each successive level adds an extra height of whatever your 'woodStockT' value is set to.  To add buttons to your design, do pedalManager.addButton(level) in the order that you want them to be located on the pedal going from left to right:<br/>
@@ -69,31 +69,32 @@ Run job0 to cut out the base. Make sure you export your design with the correct 
 
 Run job1 to cut out the higher level button stacks.
 
-Run job2 to cutout plastic presser panels.  1.5mm thick ABS plastic is ideal. Thicker and it may not flex right, but thinner and it may flex too much.  
+Run job2 to cut out plastic presser panels.  1.5mm thick ABS plastic is ideal. Thicker and it may not flex right, but thinner and it may flex too much.  
 
-Run job3 to cutout the plastic top cover panel and the usb panel
+Run job3 to cut out the plastic top cover panel and the usb panel
 
 **By Hand Method:**
 
 This requires a little more elbow grease than the cnc method but it's how I made the first prototype, which only took a few hours.
-Print a template and use it to mark your parts.  Carefully saw everything out and route the pockets and wire tracks. A trick for getting accurate depths by hand is to snap a drill bit in half so its short enough to stick only a few mm out of the chuck of a hand drill, and then set it to the exact depth you want for a given section.  Then just quickly sink a bunch of holes in that area.  Now when you dremel, you just need to erase the holes and you'll end up with a relatively even and correct depth.  It may help to glue up the button stacks before routing (see photos below) so that you have a bigger object which is easier to clamp down.
+Print a template and use it to mark your parts.  Carefully saw everything out and route the pockets and wire tracks with a Dremel. A trick for getting accurate depths by hand is to snap a drill bit in half so its short enough to stick only a few mm out of the chuck of a hand drill, and then set it to the exact depth you want for a given section.  Then just quickly sink a bunch of holes in that area.  Now when you dremel, you just need to erase the holes and you'll end up with a relatively even and correct depth.  It may help to glue up the button stacks before routing (see photos below) so that you have a bigger object which is easier to clamp down.
 
 For cutting out the plastic panels, scissors or shears work fine.  
 
 **Both Methods:**
 
-You now should have all your wooden parts cut and routed.
+You now should have all your wooden parts cut and routed:
 
-All wooden parts for a 3-stack pedal ready for gluing:
 ![AllWoodenParts](https://user-images.githubusercontent.com/11184076/194709312-8ccc57ca-bd32-420a-b293-44cc3b8276b4.jpg)
 
-Stacks glued to base:
+You want to glue up the stacks according to your design:
+
 ![gluedStacks](https://user-images.githubusercontent.com/11184076/194709350-ee8aec3d-d0d6-4c07-8790-e6ef6b2a4e07.jpg)
 
 The next step is to connect the higher level wire tracks to the tracks routed in the base by drilling diagonally down to create a tunnel.  Typically a 1/8 bit works well for most wires:
+
 ![DrillChannelBetweenStackAndBase](https://user-images.githubusercontent.com/11184076/194709375-d7ec4cb2-669f-4f45-b680-b4775ba5ba58.jpg)
 
-
+If you are going to stain/seal the pedal, now is the time to do it.
 
 
 ### Wiring and Finishing the Pedal
@@ -104,7 +105,7 @@ Using the pcb is a better option because the tight fits means no need for screws
 Cut a strip of 6mm foam to sit into the foam cutout for each panel.  For a stiffer button feel, fill up the whole slot.  For an easier to press one use
 a shorter piece.  You dont have to add foam at all but the button will be extremely clicky and will probably wear out sooner.
 
-Use a hand drill to make pilot holes for all the plastic panels and connect them with #4 wood screws.
+Use a hand drill to make 1/16" pilot holes for all the plastic panels and connect them with #4 wood screws.
 
 At this point you can use a thin layer of silicone or other adhesive to glue a sheet of foam to the bottom of the pedal to increase friction with the floor.
 
@@ -112,7 +113,7 @@ At this point you can use a thin layer of silicone or other adhesive to glue a s
 
 There are a few options for how the StackPedal actually interfaces with a computer:
 
-A) The simplest is to use something like an Arduino Nano and the default Arduino Mouse library, with a usb cable providing both power and data connection.  In the StackPedalGenerator sketch, an Elegoo Arduino Nano is used for the mcu pocket size and usb jack location. 
+A) The simplest is to use something like an Arduino Nano and the default Arduino Mouse library, with a usb cable providing both power and data connection.  In the StackPedalGenerator sketch, an Elegoo Arduino Nano is used for the mcu pocket size and usb jack location.  If using an offbrand board (such as an Elegoo Nano) you may need to download the ch430 usb driver and install it on your computer.
 
 B) An ESP32 or other mcu with built-in Bluetooth, using a usb cable for power only.  This can be powered via the computer's port if you want, but can also plug into a wall outlet via a 5V block.  This is helpful since the StackPedal sits on the ground where reaching the computer with a cable might be a hassle.  It also frees up a port.
 
