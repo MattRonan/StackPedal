@@ -6,7 +6,7 @@ StackPedal is ideal for activities that involve lots of clicking or scrolling, s
 
 # Build Instructions:
 
-There are 2 ways to build the physical pedal.  Either export Gcode files from the Processing sketch to run on a CNC router, or export a PDF template, print it out, and route everything by hand. Whichever method you choose, use the StackPedalGenerator sketch to layout your pedal design. 
+There are 2 ways to build the physical pedal.  Either export Gcode files from the Processing sketch to run on a CNC router, or export a PDF template, print it out, and route everything by hand.
 
 ### Recommended Supplies List:
 
