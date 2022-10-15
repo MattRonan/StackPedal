@@ -100,7 +100,7 @@ If you are going to stain/seal the pedal, now is the time to do it.
 
 ### Wiring and Finishing the Pedal
 
-Wire up the buttons to either some protoboard or the [official button pcb](https://oshpark.com/shared_projects/baTaN6WL "Named link title")
+Wire up the buttons to either some protoboard or the [official button pcb.](https://oshpark.com/shared_projects/baTaN6WL "Named link title")
 Using the pcb is a better option because the tight fits means no need for screws.  You can achieve the same thing with protoboard if you take the time to dial it in.  Make your connections to the microcontroller.
 
 Cut a strip of 6mm foam to sit into the foam cutout for each panel.  For a stiffer button feel, fill up the whole slot.  For an easier to press one use
