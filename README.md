@@ -141,3 +141,7 @@ An example list of materials and their source, with base cost followed by approx
 
 Total cost if you have to buy all of these things is $45.65.  But the per pedal cost is a maximum of $18.26.  It goes down more if you buy a bigger pack of screws, a bigger sheet of plastic, etc.  I'm not including other odds and ends like wire, solder, adhesive, polyurethane, brushes etc.  
 
+TODO LIST:
+-don't double cut mcu pockets.  
+-how can we export a pdf with the correct mm dimensions automatically, regardless of display size?
+-real time pedal variable editing.  Would require saving to a txt file and pulling variables from there, instead of from the sketch.
