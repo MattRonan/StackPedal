@@ -17,6 +17,7 @@ There are 2 ways to build the physical pedal.  Either export Gcode files from th
 - Button PCB ([Official board on OSHPark](https://oshpark.com/shared_projects/baTaN6WL "Named link title"))
 - Foam sheet, 6mm thick 
 - Foam sheet, 2mm thick (or adhesive non-slip backing)
+- Silicone adhesive (if using non-adhesive backed foam sheet)
 - #4 wood screws
 - 26AWG wire (or similar)
 
