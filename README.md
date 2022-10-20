@@ -1,8 +1,8 @@
 # StackPedal
 
-### A beautiful, dirt cheap, open source mouse pedal. 
+### A customizeable, cheap, open source mouse pedal. 
 
-StackPedal is ideal for activities that involve lots of clicking or scrolling, such as graphic design, CAD, video editing, and copyediting.  The cheapest available mouse pedals are typically around 50$ and bulky.  With StackPedal you can have a compact, lightweight design with however many buttons you need for under 20$ (see price notes at very bottom).  Provided are a Processing sketch which generates a design based on your parameters, and a basic Arduino sketch to let you dictate the messages your buttons will send.  The default sketch settings are for either an Arduino Nano or ESP32 as the microcontroller but you can use whatever you want.
+StackPedal is ideal for activities that involve lots of clicking or scrolling, such as graphic design, CAD, video editing, and copyediting.  The cheapest available mouse pedals are typically around 50$ and bulky.  With StackPedal you can have a compact, lightweight design with however many buttons you need for under 20$ (see price notes at very bottom).  Provided are a Processing sketch which generates a design based on your parameters, and a basic Arduino sketch to let you dictate the messages your buttons will send.  The default sketch settings are for either a Teensy LC/3.2/4.0 or ESP32 as the microcontroller.  Many other microcontrollers can work.  One that you should specifically avoid is Arduino Nano and especially any of the ubiquitous Nano clones, because their usb hardware makes them unable to act as an HID (mouse). 
 
 # Build Instructions:
 
@@ -10,7 +10,7 @@ There are 2 ways to build the physical pedal.  Either export Gcode files from th
 
 ### Recommended Supplies List:
 
-- Microcontroller (Arduino Nano or ESP32 recommended)
+- Microcontroller (Teensy LC/3.2/4.0 or ESP32 recommended)
 - Pine board, 1/2" (12.5mm) thick
 - Plastic sheet, 1/16" (1.5mm) thick
 - 5mm tactile buttons
@@ -114,23 +114,19 @@ At this point you want to put some kind of grippy backing onto the bottom of the
 
 There are a few options for how the StackPedal actually interfaces with a computer:
 
-A) The simplest is to use something like an Arduino Nano and the default Arduino Mouse library, with a usb cable providing both power and data connection.  In the StackPedalGenerator sketch, an Elegoo Arduino Nano is used for the mcu pocket size and usb jack location.  If using an offbrand board (such as an Elegoo Nano) you may need to download the ch430 usb driver and install it on your computer.
+A) Having the usb cable providing both power and data connection.  Any microcontroller that supports HID will work in this way.
 
-B) An ESP32 or other mcu with built-in Bluetooth, using a usb cable for power only.  This can be powered via the computer's port if you want, but can also plug into a wall outlet via a 5V block.  This is helpful since the StackPedal sits on the ground where reaching the computer with a cable might be a hassle.  It also frees up a port.
+B) With an ESP32 or other mcu with built-in Bluetooth, using a usb cable for power only.  This can be powered via the computer's port if you want, but can also plug into a wall outlet via a 5V block.  This is helpful since the StackPedal sits on the ground where reaching the computer with a cable might be a hassle.  It also frees up a port.  Communication with the computer is via Bluetooth.
 
-C)  ESP32 or other mcu with built-in Bluetooth, using a battery pack (rechargeable or not).  This is a fully wireless solution but requires changing the code to make the mcu go to sleep when not transmitting, otherwise it will tear thru batteries really quickly.  A great writeup on ESP32 deep sleep can be found here https://lastminuteengineers.com/esp32-deep-sleep-wakeup-sources/ 
+C)  With an ESP32 or other mcu with built-in Bluetooth, using a battery pack (rechargeable or not).  This is a fully wireless solution but requires changing the code to make the mcu go to sleep when not transmitting, otherwise it will tear thru batteries really quickly.  A great writeup on ESP32 deep sleep can be found here https://lastminuteengineers.com/esp32-deep-sleep-wakeup-sources/ 
 
 For options B and C, T-vK made a great BLE mouse library for the ESP32 which can be found at https://github.com/T-vK/ESP32-BLE-Mouse 
-
-If using the default Arduino Nano approach, use the "non-Bluetooth" sketch to set your buttons to send the commands that you want.
-For ESP32, use the "ESP32_BLE" sketch. These have options for left, right, and middle clicks, plus scrolling up and down but more are possible.  The StackPedal can also be used to send keyboard strokes for foot-controlled hotkeys.
-
 
 ### Price Notes
 
 An example list of materials and their source, with base cost followed by approximate actual cost for the 3-stack pedal shown in construction photos.  
 
-- Arduino Nano (Offbrand), Amazon, pack of three:  $20, 1 x $6.33
+- ESP32, Amazon, pack of three:  $21, 1 x $7
 - Pine board, Lowes, 1/2" thick 3ft long: $5, approx $2.50 per
 - Plastic sheet, Amazon, 1/16" thick: $8, $4 per 
 - 5mm tactile buttons, Amazon, pack of 100: $6, 3 x $0.06 (I hate Amazon but it's hard not to buy things priced like this)
@@ -139,7 +135,7 @@ An example list of materials and their source, with base cost followed by approx
 - Foam sheet, 2mm thick, Michaels, $1, approx $0.50 per
 - #4 wood screws, Lowes, 2 x packs of 8: $3.00
 
-Total cost if you have to buy all of these things is $45.65.  But the per pedal cost is a maximum of $18.26.  It goes down more if you buy a bigger pack of screws, a bigger sheet of plastic, etc.  I'm not including other odds and ends like wire, solder, adhesive, polyurethane, brushes etc.  
+Total cost if you have to buy all of these things is $46.32.  But the per pedal cost is a maximum of $19.04, which goes down more if you buy a bigger pack of screws, a bigger sheet of plastic, etc.  I'm not including other odds and ends like wire, solder, adhesive, polyurethane, brushes etc.  
 
 TODO LIST:
 -don't double cut mcu pockets.  
