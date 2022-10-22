@@ -4,6 +4,8 @@
 
 StackPedal is ideal for activities that involve lots of clicking or scrolling, such as graphic design, CAD, video editing, and copyediting.  The cheapest available mouse pedals are typically around 50$ and bulky.  With StackPedal you can have a compact, lightweight design with however many buttons you need for under 20$ (see price notes at very bottom).  Provided are a Processing sketch which generates a design based on your parameters, and a basic Arduino sketch to let you dictate the messages your buttons will send.  The default sketch settings are for either a Teensy LC/3.2/4.0 or ESP32 as the microcontroller.  Many other microcontrollers can work.  One that you should specifically avoid is Arduino Nano and especially any of the ubiquitous Nano clones, because their usb hardware makes them unable to act as an HID (mouse). 
 
+The pedal shown in this readme uses an ESP32 (LOLIN32) which can be found on Amazon.  These are currently one of the cheapest boards that can act as an HID, costing as low as $6 if you buy them in packs of 4.  For a more compact pedal, Teensy LC can be used (for slightly more money), but due to the ongoing chip shortage, getting one is difficult.  Teensy 4.0 is more available, but costs about $20.  
+
 # Build Instructions:
 
 There are 2 ways to build the physical pedal.  Either export Gcode files from the Processing sketch to run on a CNC router, or export a PDF template, print it out, and route everything by hand.
