@@ -5,9 +5,11 @@
    A program to generate gcode and a printable template
    For a custom StackPedalManager build.
   
-   *Be sure to set the values in the 'USER VALUES' box below*
-   
+   *!!Be sure to correctly set the values in the 'USER VALUES' box below.  Failure to do so could destroy your machine*
+
    *ALL DIMENSIONS ARE IN MM*
+   
+   MIT License
    
 */
 
