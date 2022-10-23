@@ -16,15 +16,17 @@ import java.awt.event.*;
 import java.io.*;
 import processing.pdf.*;
 
-//-----------------------~~!!!! USER VALUES !!!!
-//------CNC MACHINE RELATED---
+
+//--------------------------------------~~!!!! USER VALUES !!!!
+
+//------CNC MACHINE RELATED--- *** IF YOU DON'T SET THESE CNC VARIABLES CORRECTLY YOU COULD DAMAGE YOUR MACHINE**
 float toolR = 1.5;         //** measure your bit, divide by 2.  A 3mm (1/8") bit is recommended
 float woodStockT = 12.5;   //** the thickness of your wooden board.  Determines the thickness of each stack level.
 float woodStockW = 140;    //** the width of your woodenboard.  This is important for the calculation of layout of the stacks in job1
 float plasticStockT = 1.5; //** thickness of the plastic used for the electronics cover and the presser panels.
 
-int highSpeed = 650;       //set these speeds and steps to what your machine needs. THESE ARE CURRENTLY SET FOR PINE on a small machine.  If you use a harder wood make sure these aren't too agressive for your machine.
-int normalSpeed = 500;
+int highSpeed = 600;       //set these speeds and steps to what your machine needs. THESE ARE CURRENTLY SET FOR PINE on a small machine.  If you use a harder wood make sure these aren't too agressive for your machine.
+int normalSpeed = 450;
 int lowSpeed = 250;
 int plungeSpeed = 50;
 float bigStep = 2;          //steps are how deep each pass is on the z axis
@@ -38,24 +40,29 @@ float stepover = 2;         //default stepover
 float sF = 5.25;//scale factor of the pixels for the drawing of the design. depnding on your screen it may not be equally accurate in BOTH x and y.  TODO, a way to export a png thats unit-based instead of using saveFrame?
 
 //UNIVERSAL DESIGN SETTINGS
-//elegoo nano settings
+
+//Teensy LC/3.2/4.0 settings
+/*
 float mcuW = 18.0; //the width of your microcontroller.  These dimensions are an Elegoo Arduino Nano.  Add .25mm to actual dimension for tolerance
 float mcuL = 44;//the length of your microcontroller. (Add about 1mm to actual dimension to account for rounding of the back walls corners + tolerance)
 float mcuH = 7.75; //the total height of your microcontroller.  This determines how deep the mcu pocket will be. ( Add .25mm to actual dimension for tolerance)
 float mcuUSBW = 7.5; //width of usb jack.  Determines width of opening in plactic side panel.
 float mcuUSBH = 3.75; //height of usb jack.  Determines how tall the opening is in the plastic side panel.
-float mcuUSBHeightOffset = 0;// on some boards such as ESP32, the usb jack might not be the highest point.  This is how much lower the usb jack is than the highest point.  (highest point in those cases is usually a PH connector)
-
+float mcuUSBHeightOffset = 0; //if the usb jack on your board is the highest point, this should be zero.  If something else is higher, like the ph2 connector on an ESP32 for example, 
+                               //then the opening for the usb jack will need to be offset to be lower.  On a Teensy LC, the reset button and jak are basically both then highest point.
+float mcuUSBXOffset = 0; //If your mcu board's usb jack is not centered, this pushes the cutout in the plastic usb panel left or right.  0 if it's centered.
+ //end teensy
+*/
 
 //ESP32 settings (LOLIN32 version)
-/*
+
 float mcuW = 25.75; //the width of your microcontroller.  These dimensions are an ESP32 (LOLIN32) .  Add .25mm to actual dimension for tolerance
-float mcuL = 58.25;//the length of your microcontroller. (Add about 1mm to actual dimension to account for rounding of the back walls corners + tolerance)
+float mcuL = 59.25;//the length of your microcontroller. (Add about 1mm to actual dimension to account for rounding of the back walls corners + tolerance) (USB overhang shouldnt be included)
 float mcuH = 7.0; //the total height of your microcontroller.  This determines how deep the mcu pocket will be. ( Add .25mm to actual dimension for tolerance)
 float mcuUSBW = 7.5; //width of usb jack.  Determines width of opening in plactic side panel.
 float mcuUSBH = 3; //height of usb jack.  Determines how tall the opening is in the plastic side panel.
 float mcuUSBHeightOffset = 3.5;//distance between usb jack top and the highest point on the board.  On a lolin32 the highest point is the ph2 connector, top of usb jack is 3.5mm lower.  This number impacts the position of the jack cutout in the USB panel
-*/
+float mcuUSBXOffset = -3; //If your mcu board's usb jack is not centered, this pushes the cutout in the plastic usb panel left or right.  0 if it's centered. 
 //end esp32
 
 float baseHeight = 128; //the dimension of the base measured parallel to the pedals. ie this minus stackL is how much space is left for the microcontroller area.
@@ -69,7 +76,7 @@ float usbPanelL = mcuW + 20; // 20 gives 10mm on each side for the mounting scre
 float presserPanelScrewClearance = 8; //2 screws hold in each presser panel.  Holes are drilled this distance from right and left side.  For extra long panels, you may want to add a 3rd middle screw by hand.
 float topCoverScrewClearance = 4; //distance of screw holes from edges on top cover
 float buttonReliefDepth = 8; //section where button+PCB sits.  with a 5mm button and the 1.6mm board+solder joints, there should be .5mm to 1mm of clearance for the button
-float otherReliefDepth = 5; //where the button isnt, remove enough material so that the plastic presser panels dont get blocked by wood when pressed.
+float otherReliefDepth = 3; //where the button isnt, remove enough material so that the plastic presser panels dont get blocked by wood when pressed.
 float wireTrackDepth = 3; //depth of tracks leading to the mcu pocket
 float ledgeClearance = 6; //distance out from top side of pedal to carve straight before heading to mcu
 float stackL = 72; //length of button stacks.  
@@ -83,7 +90,7 @@ float defaultFoamThickness = 5.5; //foam slot width.  This is set to use 6mm foa
 float defaultFoamSlotWall = 4; //thickness of the front foam slot wall
 //------------------------------------------------------------
 
-float[] buttonPCBDimension = {18,12}; //the official PCB is on osh park at https://oshpark.com/shared_projects/baTaN6WL
+float[] buttonPCBDimension = {18.25,12.25}; //the official PCB is 18mm by 12mm.  It can been found on osh park at https://oshpark.com/shared_projects/baTaN6WL
 float actuatorPosOffset = 1.5;  //button on official pcbs is not directly in the center, so this offset accounts for that.
 
 StackPedalManager pedalManager = new StackPedalManager(); 
@@ -510,16 +517,18 @@ void exportGCode(){
      switch(mcuJackWall){
            case 0: 
                    rectangularFace((pedalManager.mcuTL[0]) + 0, (pedalManager.mcuTL[1]) *invY,  mcuL,  mcuW*invY,in,corner,z,toolR,stepover,normalSpeed ); //pedalManager.mcu pocket
-                   rectangularFace((pedalManager.mcuTL[0])+0+((mcuL-(mcuL*clearanceFactor))/2),  (( pedalManager.mcuTL[1] - mcuConnectionClearanceSize ))*invY,  (mcuL*clearanceFactor),  (mcuW+(mcuConnectionClearanceSize*2))*invY,in,corner,z,toolR,stepover,normalSpeed  ); //extra relief for wires           
-                   
+                   rectangularFace((pedalManager.mcuTL[0])+0+((mcuL-(mcuL*clearanceFactor))/2),  (( pedalManager.mcuTL[1] - mcuConnectionClearanceSize ))*invY,  (mcuL*clearanceFactor),  ((mcuConnectionClearanceSize*2))*invY,in,corner,z,toolR,stepover,normalSpeed  ); //extra relief for wires           
+                   rectangularFace((pedalManager.mcuTL[0])+0+((mcuL-(mcuL*clearanceFactor))/2),  (( pedalManager.mcuTL[1] - mcuConnectionClearanceSize+mcuW ))*invY,  (mcuL*clearanceFactor),  ((mcuConnectionClearanceSize*2))*invY,in,corner,z,toolR,stepover,normalSpeed  ); //extra relief for wires   
                    break;
            case 1: 
                    rectangularFace((pedalManager.mcuTL[0]) + 0, (pedalManager.mcuTL[1]) *invY,  mcuW,  mcuL*invY,in,corner,z,toolR,stepover,normalSpeed  ); //pedalManager.mcu pocket
-                   rectangularFace(((pedalManager.mcuTL[0] - mcuConnectionClearanceSize)) + 0, ((pedalManager.mcuTL[1]) +0+((mcuL-(mcuL*clearanceFactor))/2))*invY, ( mcuW+mcuConnectionClearanceSize*2),  mcuL*clearanceFactor*invY,in,corner,z,toolR,stepover,normalSpeed  );               
+                   rectangularFace(((pedalManager.mcuTL[0] - mcuConnectionClearanceSize)) + 0, ((pedalManager.mcuTL[1]) +0+((mcuL-(mcuL*clearanceFactor))/2))*invY, ( mcuConnectionClearanceSize*2),  mcuL*clearanceFactor*invY,in,corner,z,toolR,stepover,normalSpeed  );               
+                   rectangularFace(((pedalManager.mcuTL[0] - mcuConnectionClearanceSize+mcuW)) + 0, ((pedalManager.mcuTL[1]) +0+((mcuL-(mcuL*clearanceFactor))/2))*invY, ( mcuConnectionClearanceSize*2),  mcuL*clearanceFactor*invY,in,corner,z,toolR,stepover,normalSpeed  );               
                    break;
            case 2:  
                    rectangularFace((pedalManager.mcuTL[0]) + 0, (pedalManager.mcuTL[1]) *invY, mcuL,  mcuW*invY,in,corner,z,toolR,stepover,normalSpeed  ); //pedalManager.mcu pocket
-                   rectangularFace((pedalManager.mcuTL[0])+0+((mcuL-(mcuL*clearanceFactor))/2),  (( pedalManager.mcuTL[1] - mcuConnectionClearanceSize ))*invY,  (mcuL*clearanceFactor),  (mcuW+(mcuConnectionClearanceSize*2))*invY,in,corner,z,toolR,stepover,normalSpeed  ); //extra relief for wires
+                   rectangularFace((pedalManager.mcuTL[0])+0+((mcuL-(mcuL*clearanceFactor))/2),  (( pedalManager.mcuTL[1] - mcuConnectionClearanceSize ))*invY,  (mcuL*clearanceFactor),  ((mcuConnectionClearanceSize*2))*invY,in,corner,z,toolR,stepover,normalSpeed  ); //extra relief for wires
+                   rectangularFace((pedalManager.mcuTL[0])+0+((mcuL-(mcuL*clearanceFactor))/2),  (( pedalManager.mcuTL[1] - mcuConnectionClearanceSize +mcuW ))*invY,  (mcuL*clearanceFactor),  ((mcuConnectionClearanceSize*2))*invY,in,corner,z,toolR,stepover,normalSpeed  ); //extra relief for wires
                    break;
          }
      }
@@ -832,7 +841,7 @@ void exportGCode(){
    
    //usb cutout
    for(float z = 0; z >= (plasticStockT+.5)*-1; z -= microStep){
-     rectangularFace(xOff+(usbPanelL/2)-(mcuUSBW/2),  yOff+mcuUSBHeightOffset-toolR,  mcuUSBW,  mcuUSBH+toolR,in,corner,z,toolR,stepover,normalSpeed);
+     rectangularFace(xOff+(usbPanelL/2)-(mcuUSBW/2)+mcuUSBXOffset,  yOff+mcuUSBHeightOffset-toolR,  mcuUSBW,  mcuUSBH,in,corner,z,toolR,stepover,normalSpeed);
    }
    
    //screw locations 
@@ -926,7 +935,6 @@ void drillHole(float x, float y, float zee){
 void rectangularFace(float x, float y, float l, float w, int inOut, int cornOrCent, float z, float toolR, float stepover,int speed){
   //xy either refers to top left corner or to center. defined by cornOrCent
           
-  
   if(cornOrCent == 0){  
   }
   else if(cornOrCent == 1){//we always compute rectangles from bottom left corner.  So to cut one thats centered on the xy we passed in, we simply pull that left corner back by l/2 and down by w/2
