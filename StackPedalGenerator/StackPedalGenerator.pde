@@ -6,10 +6,8 @@
    For a custom StackPedalManager build.
   
    *!!Be sure to correctly set the values in the 'USER VALUES' box below.  Failure to do so could destroy your machine*
-
-   *ALL DIMENSIONS ARE IN MM*
    
-   MIT License
+   *ALL DIMENSIONS ARE IN MM*
    
 */
 
@@ -85,7 +83,7 @@ float stackL = 72; //length of button stacks.
 float stackLedgeW = 15; //plastic presser panel screws into here. 15mm is usually fine.
 
 //PER-STACK DESIGN SETTINGS
-//these can be customized per button stack in setup below
+//these default settings can be customized per button stack once button is created in setup below
 float defaultStackW = 45; //if you want to make a stack wider, say 1 wide middle stack and 2 thinner outers, you can set them individually after this
 float defaultStackMargin = 2; //margin between stacks.  Doesnt get applied to the 2 outside edges.  
 float defaultFoamThickness = 5.5; //foam slot width.  This is set to use 6mm foam that you can find at Michaels or online. (you want it to be about .5mm less than the foam so it stays put.)
@@ -168,6 +166,7 @@ void draw() {
   
   
   if(keyPressed && millis() > escapeTime){
+    println("why");
     if(key == 'p'){
       templateExportPath = exportTemplateDialog();
       println("FUK");
@@ -267,7 +266,7 @@ class StackPedalManager{
   public float[] origin = {20,60}; //top left corner of base in pixels for drawing.  For gCode origin is always 0,0
  
   float[] mcuCenter = {0,0};
-  float[] mcuTL = {0,0};
+  float[] mcuBL = {0,0};
   
   ButtonStack[] buttons = new ButtonStack[20]; 
   
@@ -286,7 +285,7 @@ class StackPedalManager{
     
     for(int i = 0; i < numButtons; i++){
       
-      buttons[i].y = baseHeight - stackL; //we think from top left corner down since thats how P draws stuff.  So button coords refer to the top left corner of the button.
+      buttons[i].y = 0; //we returned to thinking origin = bottom left, and we invert the proc drawing to look correct
        
       if(i != 0){
 
@@ -298,20 +297,20 @@ class StackPedalManager{
     }
     
     switch(mcuJackWall){
-         case 0: mcuTL[0] = plasticStockT;//this looks wierd but its just that we recess the plastic usb panel, which pushes the mcu right in this case, where it would otherwise be at 0
-                 mcuTL[1] = (baseHeight-stackL)*mcuJackPos-(mcuW/2);
-                 mcuCenter[0] = mcuTL[0] + mcuL/2;
-                 mcuCenter[1] = mcuTL[1] +(mcuW/2);
+         case 0: mcuBL[0] = plasticStockT;//this looks wierd but its just that we recess the plastic usb panel, which pushes the mcu right in this case, where it would otherwise be at 0
+                 mcuBL[1] = stackL+((baseHeight-stackL)*mcuJackPos)-(mcuW/2);
+                 mcuCenter[0] = mcuBL[0] + mcuL/2;
+                 mcuCenter[1] = mcuBL[1] +(mcuW/2);
                  break;
-         case 1: mcuTL[0] = (baseWidth*mcuJackPos) - (mcuW/2);
-                 mcuTL[1] = plasticStockT;
-                 mcuCenter[0] = mcuTL[0] + mcuW/2;
-                 mcuCenter[1] = mcuTL[1] +(mcuL/2);
+         case 1: mcuBL[0] = (baseWidth*mcuJackPos) - (mcuW/2);
+                 mcuBL[1] = baseHeight-plasticStockT;
+                 mcuCenter[0] = mcuBL[0] + mcuW/2;
+                 mcuCenter[1] = mcuBL[1] +(mcuL/2);
                  break;
-         case 2:  mcuTL[0] = baseWidth-mcuL;//this looks wierd but its just that we recess the plastic usb panel, which pushes the mcu right in this case, where it would otherwise be at 0
-                 mcuTL[1] = (baseHeight-stackL)*mcuJackPos-(mcuW/2);
-                 mcuCenter[0] = mcuTL[0] + mcuL/2;
-                 mcuCenter[1] = mcuTL[1] +(mcuW/2);
+         case 2:  mcuBL[0] = baseWidth-mcuL-plasticStockT;
+                 mcuBL[1] = stackL+((baseHeight-stackL)*mcuJackPos)-(mcuW/2);
+                 mcuCenter[0] = mcuBL[0] + mcuL/2;
+                 mcuCenter[1] = mcuBL[1] +(mcuW/2);
                  break;
        }
   }
@@ -329,24 +328,24 @@ class StackPedalManager{
        strokeWeight(3);
        switch(mcuJackWall){
          case 0: 
-                 rect((mcuTL[0]*sF) + origin[0], (mcuTL[1]*sF) + origin[1],  mcuL*sF,  mcuW*sF  ); //mcu pocket
-                 rect((mcuTL[0]*sF)+origin[0]+((mcuL-(mcuL*clearanceFactor))/2*sF),  (( mcuTL[1] - mcuConnectionClearanceSize )*sF)+origin[1],  (mcuL*clearanceFactor)*sF,  (mcuW+(mcuConnectionClearanceSize*2))*sF  ); //extra relief for wires
+                 rect((mcuBL[0]*sF) + origin[0], (mcuBL[1]*sF) + origin[1],  mcuL*sF,  mcuW*sF  ); //mcu pocket
+                 rect((mcuBL[0]*sF)+origin[0]+((mcuL-(mcuL*clearanceFactor))/2*sF),  (( mcuBL[1] - mcuConnectionClearanceSize )*sF)+origin[1],  (mcuL*clearanceFactor)*sF,  (mcuW+(mcuConnectionClearanceSize*2))*sF  ); //extra relief for wires
                  strokeWeight(5);
-                 line(0+origin[0],  (mcuTL[1]-(usbPanelL-mcuW)/2) * sF +origin[1],  0+origin[0],  ((mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)*sF+origin[1]);
+                 line(0+origin[0],  (mcuBL[1]-(usbPanelL-mcuW)/2) * sF +origin[1],  0+origin[0],  ((mcuBL[1]-(usbPanelL-mcuW)/2)+usbPanelL)*sF+origin[1]);
                  strokeWeight(4);
                  break;
          case 1: 
-                 rect((mcuTL[0]*sF) + origin[0], (mcuTL[1]*sF) + origin[1],  mcuW*sF,  mcuL*sF  ); //mcu pocket
-                 rect(((mcuTL[0] - mcuConnectionClearanceSize)*sF) + origin[0], (mcuTL[1]*sF) + origin[1]+((mcuL-(mcuL*clearanceFactor))/2*sF), ( mcuW+mcuConnectionClearanceSize*2)*sF,  mcuL*sF*clearanceFactor  ); 
+                 rect((mcuBL[0]*sF) + origin[0], (mcuBL[1]*sF) + origin[1],  mcuW*sF,  mcuL*sF  ); //mcu pocket
+                 rect(((mcuBL[0] - mcuConnectionClearanceSize)*sF) + origin[0], (mcuBL[1]*sF) + origin[1]+((mcuL-(mcuL*clearanceFactor))/2*sF), ( mcuW+mcuConnectionClearanceSize*2)*sF,  mcuL*sF*clearanceFactor  ); 
                  strokeWeight(5);
-                 line((mcuTL[0]-(usbPanelL-mcuW)/2) * sF + origin[0],  0+origin[1], ((mcuTL[0]-(usbPanelL-mcuW)/2)+usbPanelL)*sF+origin[0],  0+origin[1]);
+                 line((mcuBL[0]-(usbPanelL-mcuW)/2) * sF + origin[0],  0+origin[1], ((mcuBL[0]-(usbPanelL-mcuW)/2)+usbPanelL)*sF+origin[0],  0+origin[1]);
                  strokeWeight(4);
                  break;
          case 2:  
-                 rect((mcuTL[0]*sF) + origin[0], (mcuTL[1]*sF) + origin[1],  mcuL*sF,  mcuW*sF  ); //mcu pocket
-                 rect((mcuTL[0]*sF)+origin[0]+((mcuL-(mcuL*clearanceFactor))/2*sF),  (( mcuTL[1] - mcuConnectionClearanceSize )*sF)+origin[1],  (mcuL*clearanceFactor)*sF,  (mcuW+(mcuConnectionClearanceSize*2))*sF  ); //extra relief for wires
+                 rect((mcuBL[0]*sF) + origin[0], (mcuBL[1]*sF) + origin[1],  mcuL*sF,  mcuW*sF  ); //mcu pocket
+                 rect((mcuBL[0]*sF)+origin[0]+((mcuL-(mcuL*clearanceFactor))/2*sF),  (( mcuBL[1] - mcuConnectionClearanceSize )*sF)+origin[1],  (mcuL*clearanceFactor)*sF,  (mcuW+(mcuConnectionClearanceSize*2))*sF  ); //extra relief for wires
                  strokeWeight(5);
-                 line(baseWidth*sF+origin[0],  (mcuTL[1]-(usbPanelL-mcuW)/2) * sF +origin[1],  baseWidth*sF+origin[0],  ((mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)*sF+origin[1]);
+                 line(baseWidth*sF+origin[0],  (mcuBL[1]-(usbPanelL-mcuW)/2) * sF +origin[1],  baseWidth*sF+origin[0],  ((mcuBL[1]-(usbPanelL-mcuW)/2)+usbPanelL)*sF+origin[1]);
                  strokeWeight(4);
                  break;
      
@@ -362,7 +361,7 @@ class StackPedalManager{
       
        //foam slots
        stroke(102,100,255);
-       rect( ((buttons[i].foamSlotTL[0]+buttons[i].x)*sF)+origin[0],  ((buttons[i].foamSlotTL[1]+buttons[i].y)*sF)+origin[1],  buttons[i].foamSlotWidth*sF,  buttons[i].foamThickness*sF  );
+       rect( ((buttons[i].foamSlotBL[0]+buttons[i].x)*sF)+origin[0],  ((buttons[i].foamSlotBL[1]+buttons[i].y)*sF)+origin[1],  buttons[i].foamSlotWidth*sF,  buttons[i].foamThickness*sF  );
        
        //ledges
        stroke(0,200,255);
@@ -376,7 +375,7 @@ class StackPedalManager{
          stroke(252,100,55);//orange are tracks that are routed into a separate pedal piece.  ie buttons that are level 1 or higher.  The a diagnal hand-drilled hole connects it to the track in the base.
        }
        
-       rect( ((buttons[i].buttonPCBTL[0]+buttons[i].x)*sF)+origin[0],  ((buttons[i].buttonPCBTL[1]+buttons[i].y-actuatorPosOffset)*sF)+origin[1],  buttonPCBDimension[0]*sF,  buttonPCBDimension[1]*sF  );
+       rect( ((buttons[i].buttonPCBBL[0]+buttons[i].x)*sF)+origin[0],  ((buttons[i].buttonPCBBL[1]+buttons[i].y-actuatorPosOffset)*sF)+origin[1],  buttonPCBDimension[0]*sF,  buttonPCBDimension[1]*sF  );
        
        //wire tracks
        line(((buttons[i].x+(buttons[i].stackW/2))*sF) + origin[0],((buttons[i].y+buttons[i].buttonActuatorY)*sF)+origin[1],((buttons[i].x+(buttons[i].stackW/2))*sF) + origin[0],((buttons[i].y+stackLedgeW)*sF) + origin[1]);//first line reaches ledge.
@@ -400,7 +399,7 @@ class StackPedalManager{
        circle((buttons[i].x+buttons[i].stackW-presserPanelScrewClearance)*sF+origin[0],(buttons[i].y+stackLedgeW/2)*sF+origin[1],toolR*2*sF);
       
        //draw info
-       text("Level = " + buttons[i].level, ((buttons[i].buttonPCBTL[0]+buttons[i].x)*sF)+origin[0],  ((buttons[i].buttonPCBTL[1]+buttons[i].y+ buttonPCBDimension[1]+3)*sF)+origin[1]);
+       text("Level = " + buttons[i].level, ((buttons[i].buttonPCBBL[0]+buttons[i].x)*sF)+origin[0],  ((buttons[i].buttonPCBBL[1]+buttons[i].y+ buttonPCBDimension[1]+3)*sF)+origin[1]);
      
      
      }//end button loop
@@ -437,12 +436,12 @@ class StackPedalManager{
     public float x,y;
     public int level;
     
-    public float[] foamSlotTL = new float[2];
+    public float[] foamSlotBL = new float[2];
     public float foamSlotWidth; 
     float foamSlotPercent = .75; //percent of total width (.5 is a good value typically
     
     public float buttonActuatorY; 
-    public float[] buttonPCBTL = new float[2];
+    public float[] buttonPCBBL = new float[2];
     
     public ButtonStack(){
       
@@ -453,19 +452,21 @@ class StackPedalManager{
       stackMargin =  defaultStackMargin;
       foamThickness = defaultFoamThickness;
       foamSlotWall =  defaultFoamSlotWall;
-      buttonActuatorY = ((stackL-stackLedgeW)/2) + (stackLedgeW);//the y positionn of the actual clicky button plunger
       this.level = level;
       this.recalculate();
     }
     
     public void recalculate(){
       this.foamSlotWidth = this.stackW * this.foamSlotPercent;
-      this.foamSlotTL[0] = (stackW-foamSlotWidth)/2;//basically from the buttons perspective, TL of button is 0,0
-      this.foamSlotTL[1] = stackL - this.foamSlotWall - this.foamThickness;
+      this.foamSlotBL[0] = (stackW-foamSlotWidth)/2;//basically from the buttons perspective, TL of button is 0,0
+      this.foamSlotBL[1] = foamSlotWall;
    
-      this.buttonPCBTL[0] = ((this.stackW/2)-(buttonPCBDimension[0]/2));
-      this.buttonPCBTL[1] = this.buttonActuatorY - (buttonPCBDimension[1]/2);
-    }
+      
+      this.buttonPCBBL[0] = ((this.stackW/2)-(buttonPCBDimension[0]/2));
+      this.buttonPCBBL[1] = ((stackL-stackLedgeW)/2)-(buttonPCBDimension[1]/2)+actuatorPosOffset;
+      buttonActuatorY = ((stackL-stackLedgeW)/2)+actuatorPosOffset;//the y positionn of the actual clicky button plunger
+    
+  }
   }
 }
 
@@ -502,15 +503,15 @@ void exportGCode(){
     
    F.plus("F"+normalSpeed);
    
-   float invY = -1; //cutting the bass requires flipping y-axis, otherwise it will cut as a mirror image of what you designed due to how Processing defines the y axis.
+   float invY = 1; //cutting the bass requires flipping y-axis, otherwise it will cut as a mirror image of what you designed due to how Processing defines the y axis.
                     //you could flip the drawing instead but it doesn't really matter.
    
    //mark screw locations for top cover
    
-   drillHole(topCoverScrewClearance+0,(baseHeight-stackL-topCoverScrewClearance)*invY,-.5); //BL
-   drillHole(topCoverScrewClearance+0,topCoverScrewClearance*invY,-.5); //TL
-   drillHole((pedalManager.baseWidth-topCoverScrewClearance)+0,topCoverScrewClearance*invY,-.5); //TR
-   drillHole((pedalManager.baseWidth-topCoverScrewClearance)+0,(baseHeight-stackL-topCoverScrewClearance)*invY,-.5); //BR
+   drillHole(topCoverScrewClearance,(stackL+topCoverScrewClearance),-.5); //BL
+   drillHole(topCoverScrewClearance,baseHeight-topCoverScrewClearance,-.5); //TL
+   drillHole((pedalManager.baseWidth-topCoverScrewClearance),baseHeight-topCoverScrewClearance,-.5); //TR
+   drillHole((pedalManager.baseWidth-topCoverScrewClearance),(stackL+topCoverScrewClearance),-.5); //BR
    
    F.plus("G01 Z2");
    F.plus("G00 F" + normalSpeed);
@@ -518,19 +519,19 @@ void exportGCode(){
    for(float z = 0; z >= mcuH*-1; z -= normalStep){
      switch(mcuJackWall){
            case 0: 
-                   rectangularFace((pedalManager.mcuTL[0]) + 0, (pedalManager.mcuTL[1]) *invY,  mcuL,  mcuW*invY,in,corner,z,toolR,stepover,normalSpeed ); //pedalManager.mcu pocket
-                   rectangularFace((pedalManager.mcuTL[0])+0+((mcuL-(mcuL*clearanceFactor))/2),  (( pedalManager.mcuTL[1] - mcuConnectionClearanceSize ))*invY,  (mcuL*clearanceFactor),  ((mcuConnectionClearanceSize*2))*invY,in,corner,z,toolR,stepover,normalSpeed  ); //extra relief for wires           
-                   rectangularFace((pedalManager.mcuTL[0])+0+((mcuL-(mcuL*clearanceFactor))/2),  (( pedalManager.mcuTL[1] - mcuConnectionClearanceSize+mcuW ))*invY,  (mcuL*clearanceFactor),  ((mcuConnectionClearanceSize*2))*invY,in,corner,z,toolR,stepover,normalSpeed  ); //extra relief for wires   
+                   rectangularFace((pedalManager.mcuBL[0]), (pedalManager.mcuBL[1]) ,  mcuL,  mcuW,in,corner,z,toolR,stepover,normalSpeed ); //pedalManager.mcu pocket
+                   rectangularFace((pedalManager.mcuBL[0])+((mcuL-(mcuL*clearanceFactor))/2),  (( pedalManager.mcuBL[1] - mcuConnectionClearanceSize )),  (mcuL*clearanceFactor),  ((mcuConnectionClearanceSize*2)),in,corner,z,toolR,stepover,normalSpeed  ); //extra relief for wires           
+                   rectangularFace((pedalManager.mcuBL[0])+((mcuL-(mcuL*clearanceFactor))/2),  (( pedalManager.mcuBL[1] - mcuConnectionClearanceSize+mcuW )),  (mcuL*clearanceFactor),  ((mcuConnectionClearanceSize*2)),in,corner,z,toolR,stepover,normalSpeed  ); //extra relief for wires   
                    break;
            case 1: 
-                   rectangularFace((pedalManager.mcuTL[0]) + 0, (pedalManager.mcuTL[1]) *invY,  mcuW,  mcuL*invY,in,corner,z,toolR,stepover,normalSpeed  ); //pedalManager.mcu pocket
-                   rectangularFace(((pedalManager.mcuTL[0] - mcuConnectionClearanceSize)) + 0, ((pedalManager.mcuTL[1]) +0+((mcuL-(mcuL*clearanceFactor))/2))*invY, ( mcuConnectionClearanceSize*2),  mcuL*clearanceFactor*invY,in,corner,z,toolR,stepover,normalSpeed  );               
-                   rectangularFace(((pedalManager.mcuTL[0] - mcuConnectionClearanceSize+mcuW)) + 0, ((pedalManager.mcuTL[1]) +0+((mcuL-(mcuL*clearanceFactor))/2))*invY, ( mcuConnectionClearanceSize*2),  mcuL*clearanceFactor*invY,in,corner,z,toolR,stepover,normalSpeed  );               
+                   rectangularFace((pedalManager.mcuBL[0]), (pedalManager.mcuBL[1]) ,  mcuW,  mcuL*invY,in,corner,z,toolR,stepover,normalSpeed  ); //pedalManager.mcu pocket
+                   rectangularFace(((pedalManager.mcuBL[0] - mcuConnectionClearanceSize)) , ((pedalManager.mcuBL[1]) +0+((mcuL-(mcuL*clearanceFactor))/2)), ( mcuConnectionClearanceSize*2),  mcuL*clearanceFactor,in,corner,z,toolR,stepover,normalSpeed  );               
+                   rectangularFace(((pedalManager.mcuBL[0] - mcuConnectionClearanceSize+mcuW)) , ((pedalManager.mcuBL[1]) +0+((mcuL-(mcuL*clearanceFactor))/2)), ( mcuConnectionClearanceSize*2),  mcuL*clearanceFactor,in,corner,z,toolR,stepover,normalSpeed  );               
                    break;
            case 2:  
-                   rectangularFace((pedalManager.mcuTL[0]) + 0, (pedalManager.mcuTL[1]) *invY, mcuL,  mcuW*invY,in,corner,z,toolR,stepover,normalSpeed  ); //pedalManager.mcu pocket
-                   rectangularFace((pedalManager.mcuTL[0])+0+((mcuL-(mcuL*clearanceFactor))/2),  (( pedalManager.mcuTL[1] - mcuConnectionClearanceSize ))*invY,  (mcuL*clearanceFactor),  ((mcuConnectionClearanceSize*2))*invY,in,corner,z,toolR,stepover,normalSpeed  ); //extra relief for wires
-                   rectangularFace((pedalManager.mcuTL[0])+0+((mcuL-(mcuL*clearanceFactor))/2),  (( pedalManager.mcuTL[1] - mcuConnectionClearanceSize +mcuW ))*invY,  (mcuL*clearanceFactor),  ((mcuConnectionClearanceSize*2))*invY,in,corner,z,toolR,stepover,normalSpeed  ); //extra relief for wires
+                   rectangularFace((pedalManager.mcuBL[0]), (pedalManager.mcuBL[1]) , mcuL,  mcuW,in,corner,z,toolR,stepover,normalSpeed  ); //pedalManager.mcu pocket
+                   rectangularFace((pedalManager.mcuBL[0])+((mcuL-(mcuL*clearanceFactor))/2),  (( pedalManager.mcuBL[1] - mcuConnectionClearanceSize )),  (mcuL*clearanceFactor),  ((mcuConnectionClearanceSize*2)),in,corner,z,toolR,stepover,normalSpeed  ); //extra relief for wires
+                   rectangularFace((pedalManager.mcuBL[0])+((mcuL-(mcuL*clearanceFactor))/2),  (( pedalManager.mcuBL[1] - mcuConnectionClearanceSize +mcuW )),  (mcuL*clearanceFactor),  ((mcuConnectionClearanceSize*2)),in,corner,z,toolR,stepover,normalSpeed  ); //extra relief for wires
                    break;
          }
      }
@@ -541,25 +542,25 @@ void exportGCode(){
      //usb recess and pad reliefs
      switch(mcuJackWall){
          case 0:         
-                 lineOptimized((pedalManager.mcuTL[0]+toolR), (pedalManager.mcuTL[1]+toolR) *invY,  pedalManager.mcuTL[0]+mcuL-toolR,  (pedalManager.mcuTL[1]+toolR) *invY,mcuH*-1,(mcuH+2)*-1,normalStep);
+                 lineOptimized((pedalManager.mcuBL[0]+toolR), (pedalManager.mcuBL[1]+toolR),  pedalManager.mcuBL[0]+mcuL-toolR,  (pedalManager.mcuBL[1]+toolR),mcuH*-1,(mcuH+2)*-1,normalStep);
                  F.plus("G01 Z2");
-                 lineOptimized((pedalManager.mcuTL[0]+toolR), (pedalManager.mcuTL[1]-toolR+mcuW) *invY,  pedalManager.mcuTL[0]+mcuL-toolR,  (pedalManager.mcuTL[1]-toolR+mcuW) *invY,mcuH*-1,(mcuH+2)*-1,normalStep);
+                 lineOptimized((pedalManager.mcuBL[0]+toolR), (pedalManager.mcuBL[1]-toolR+mcuW),  pedalManager.mcuBL[0]+mcuL-toolR,  (pedalManager.mcuBL[1]-toolR+mcuW),mcuH*-1,(mcuH+2)*-1,normalStep);
                  F.plus("G01 Z2");
-                 lineOptimized(0+0,  (pedalManager.mcuTL[1]-(usbPanelL-mcuW)/2)*invY,  0,  ((pedalManager.mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)*invY,0,(mcuH+usbPanelBottomMargin)*-1,normalStep);
+                 lineOptimized(0+0,  (pedalManager.mcuBL[1]-(usbPanelL-mcuW)/2),  0,  ((pedalManager.mcuBL[1]-(usbPanelL-mcuW)/2)+usbPanelL),0,(mcuH+usbPanelBottomMargin)*-1,normalStep);
                  break;
          case 1:      
-                 lineOptimized((pedalManager.mcuTL[0]+toolR), (pedalManager.mcuTL[1]+toolR) *invY,  (pedalManager.mcuTL[0]+toolR),  (pedalManager.mcuTL[1]-toolR+mcuL) *invY,mcuH*-1,(mcuH+2)*-1,normalStep);
+                 lineOptimized((pedalManager.mcuBL[0]+toolR), (pedalManager.mcuBL[1]+toolR),  (pedalManager.mcuBL[0]+toolR),  (pedalManager.mcuBL[1]-toolR+mcuL),mcuH*-1,(mcuH+2)*-1,normalStep);
                  F.plus("G01 Z2");
-                 lineOptimized((pedalManager.mcuTL[0]+mcuW-toolR), (pedalManager.mcuTL[1]+toolR) *invY,  (pedalManager.mcuTL[0]-toolR+mcuW),  (pedalManager.mcuTL[1]-toolR+mcuL) *invY,mcuH*-1,(mcuH+2)*-1,normalStep);
+                 lineOptimized((pedalManager.mcuBL[0]+mcuW-toolR), (pedalManager.mcuBL[1]+toolR),  (pedalManager.mcuBL[0]-toolR+mcuW),  (pedalManager.mcuBL[1]-toolR+mcuL),mcuH*-1,(mcuH+2)*-1,normalStep);
                  F.plus("G01 Z2");
-                 lineOptimized((pedalManager.mcuTL[0]-(usbPanelL-mcuW)/2),  0, ((pedalManager.mcuTL[0]-(usbPanelL-mcuW)/2)+usbPanelL), 0,0,(mcuH+usbPanelBottomMargin)*-1,normalStep);
+                 lineOptimized((pedalManager.mcuBL[0]-(usbPanelL-mcuW)/2),  0, ((pedalManager.mcuBL[0]-(usbPanelL-mcuW)/2)+usbPanelL), 0,0,(mcuH+usbPanelBottomMargin)*-1,normalStep);
                  break;
          case 2:  
-                 lineOptimized((pedalManager.mcuTL[0]+toolR), (pedalManager.mcuTL[1]+toolR) *invY,  pedalManager.mcuTL[0]+mcuL-toolR,  (pedalManager.mcuTL[1]+toolR) *invY,mcuH*-1,(mcuH+2)*-1,normalStep);
+                 lineOptimized((pedalManager.mcuBL[0]+toolR), (pedalManager.mcuBL[1]+toolR),  pedalManager.mcuBL[0]+mcuL-toolR,  (pedalManager.mcuBL[1]+toolR),mcuH*-1,(mcuH+2)*-1,normalStep);
                  F.plus("G01 Z2");
-                 lineOptimized((pedalManager.mcuTL[0])+toolR, (pedalManager.mcuTL[1]-toolR+mcuW) *invY,  pedalManager.mcuTL[0]+mcuL-toolR,  (pedalManager.mcuTL[1]-toolR+mcuW) *invY,mcuH*-1,(mcuH+2)*-1,normalStep);
+                 lineOptimized((pedalManager.mcuBL[0])+toolR, (pedalManager.mcuBL[1]-toolR+mcuW),  pedalManager.mcuBL[0]+mcuL-toolR,  (pedalManager.mcuBL[1]-toolR+mcuW),mcuH*-1,(mcuH+2)*-1,normalStep);
                  F.plus("G01 Z2");
-                 lineOptimized(pedalManager.baseWidth+0,  (pedalManager.mcuTL[1]-(usbPanelL-mcuW)/2)*invY,  pedalManager.baseWidth+0,  ((pedalManager.mcuTL[1]-(usbPanelL-mcuW)/2)+usbPanelL)*invY,0,(mcuH+usbPanelBottomMargin)*-1,normalStep);
+                 lineOptimized(pedalManager.baseWidth+0,  (pedalManager.mcuBL[1]-(usbPanelL-mcuW)/2),  pedalManager.baseWidth+0,  ((pedalManager.mcuBL[1]-(usbPanelL-mcuW)/2)+usbPanelL),0,(mcuH+usbPanelBottomMargin)*-1,normalStep);
                  break;
        }
    
@@ -577,7 +578,7 @@ void exportGCode(){
        //general relief to leave a ledge
        for(float z = 0; z >= otherReliefDepth*-1; z -= normalStep){
                                                          //note for level0 buttons, we cut it wider than the outline dictates (hence the defaultStackMargin subtraction and then increasing W by margin*2) cause otherwise the presser panel would get hung up on the wood.  Not a problem for higher level buttons.
-         rectangularFace((pedalManager.buttons[i].x) - level0PresserPanelClearance, ((pedalManager.buttons[i].y+stackLedgeW))*invY  , pedalManager.buttons[i].stackW + (level0PresserPanelClearance*2),(stackL-stackLedgeW)*invY,in,corner,z,toolR,stepover,normalSpeed );
+         rectangularFace((pedalManager.buttons[i].x) - level0PresserPanelClearance, ((pedalManager.buttons[i].y))  , pedalManager.buttons[i].stackW + (level0PresserPanelClearance*2),(stackL-stackLedgeW)*invY,in,corner,z,toolR,stepover,normalSpeed );
        }
        
        tabSize = 0;
@@ -586,7 +587,7 @@ void exportGCode(){
        
        //foam slot
        for(float z = otherReliefDepth*-1; z >= (otherReliefDepth+4)*-1; z -= normalStep){
-         rectangularFace( ((pedalManager.buttons[i].foamSlotTL[0]+pedalManager.buttons[i].x))+0,  (((pedalManager.buttons[i].foamSlotTL[1]+pedalManager.buttons[i].y))+0-toolR)*invY,  pedalManager.buttons[i].foamSlotWidth,  pedalManager.buttons[i].foamThickness*invY,in,corner,z,toolR,stepover,normalSpeed  );
+         rectangularFace( ((pedalManager.buttons[i].foamSlotBL[0]+pedalManager.buttons[i].x)),  (((pedalManager.buttons[i].foamSlotBL[1]+pedalManager.buttons[i].y))),  pedalManager.buttons[i].foamSlotWidth,  pedalManager.buttons[i].foamThickness*invY,in,corner,z,toolR,stepover,normalSpeed  );
        }
        
        F.plus("G01 Z2");
@@ -594,38 +595,38 @@ void exportGCode(){
         
        //pcb holder
        for(float z = otherReliefDepth*-1; z >= buttonReliefDepth*-1; z -= normalStep){
-         rectangularFace( ((pedalManager.buttons[i].buttonPCBTL[0]+pedalManager.buttons[i].x))+0,  ((pedalManager.buttons[i].buttonPCBTL[1]+pedalManager.buttons[i].y-actuatorPosOffset))*invY,  buttonPCBDimension[0],  buttonPCBDimension[1]*invY,in,corner,z,toolR,stepover,normalSpeed  );
+         rectangularFace( (pedalManager.buttons[i].buttonPCBBL[0]),  pedalManager.buttons[i].buttonPCBBL[1],  buttonPCBDimension[0],  buttonPCBDimension[1],in,corner,z,toolR,stepover,normalSpeed  );
        }
        
        F.plus("G01 Z2");
        F.plus("G00 F" + normalSpeed);
        
        //wire track in button area
-       lineOptimized(((pedalManager.buttons[i].x+(pedalManager.buttons[i].stackW/2))) + 0,((pedalManager.buttons[i].y+pedalManager.buttons[i].buttonActuatorY))*invY,((pedalManager.buttons[i].x+(pedalManager.buttons[i].stackW/2))) + 0,(((pedalManager.buttons[i].y+stackLedgeW))+toolR)*invY,otherReliefDepth*-1,(otherReliefDepth+wireTrackDepth)*-1,normalStep);//first line reaches ledge.
+       lineOptimized(((pedalManager.buttons[i].x+(pedalManager.buttons[i].stackW/2))),((pedalManager.buttons[i].y+pedalManager.buttons[i].buttonActuatorY)),((pedalManager.buttons[i].x+(pedalManager.buttons[i].stackW/2))),(((pedalManager.buttons[i].y+(stackL-stackLedgeW)))-toolR),otherReliefDepth*-1,(otherReliefDepth+wireTrackDepth)*-1,normalStep);//first line reaches ledge.
        
        F.plus("G01 Z2");
        F.plus("G00 F" + normalSpeed);
        
        //carve thru ledge
-       lineOptimized(((pedalManager.buttons[i].x+(pedalManager.buttons[i].stackW/2))) + 0, (((pedalManager.buttons[i].y+stackLedgeW)) + toolR)*invY, ((pedalManager.buttons[i].x+(pedalManager.buttons[i].stackW/2))) + 0, (((pedalManager.buttons[i].y)) + toolR)*invY,0,(otherReliefDepth+wireTrackDepth)*-1,normalStep);//base level buttons carve thru the ledge.
+       lineOptimized(((pedalManager.buttons[i].x+(pedalManager.buttons[i].stackW/2))), (((pedalManager.buttons[i].y+(stackL-stackLedgeW))) - toolR), ((pedalManager.buttons[i].x+(pedalManager.buttons[i].stackW/2))), (((pedalManager.buttons[i].y)+stackL) - toolR),0,(otherReliefDepth+wireTrackDepth)*-1,normalStep);//base level buttons carve thru the ledge.
        
        //screw locations 
        F.plus("G01 Z2");
        F.plus("G00 F" + normalSpeed);
-       drillHole((pedalManager.buttons[i].x+presserPanelScrewClearance)+0,(pedalManager.buttons[i].y+stackLedgeW/2)*invY,-.5);
-       drillHole((pedalManager.buttons[i].x+pedalManager.buttons[i].stackW-presserPanelScrewClearance)+0,(pedalManager.buttons[i].y+stackLedgeW/2)*invY,-.5);
+       drillHole((pedalManager.buttons[i].x+presserPanelScrewClearance)+0,(pedalManager.buttons[i].y+(stackL-stackLedgeW)+stackLedgeW/2),-.5);
+       drillHole((pedalManager.buttons[i].x+pedalManager.buttons[i].stackW-presserPanelScrewClearance)+0,(pedalManager.buttons[i].y+(stackL-stackLedgeW)+stackLedgeW/2),-.5);
        }
        
        F.plus("G01 Z2");
        F.plus("G00 F" + normalSpeed);
        
-       //carve tracks into base to mcu pocket
-       lineOptimized(((pedalManager.buttons[i].x+(pedalManager.buttons[i].stackW/2))) + 0, (((pedalManager.buttons[i].y)) + toolR)*invY,((pedalManager.buttons[i].x+(pedalManager.buttons[i].stackW/2))) + 0,(((pedalManager.buttons[i].y-ledgeClearance)) + toolR)*invY,0,(wireTrackDepth)*-1,normalStep);//carve straight out from edge of button before heading to mcu
+       //little extra straight section bfore heading to mcu
+       lineOptimized(((pedalManager.buttons[i].x+(pedalManager.buttons[i].stackW/2))), (((pedalManager.buttons[i].y)+stackL) - toolR),((pedalManager.buttons[i].x+(pedalManager.buttons[i].stackW/2))),(((pedalManager.buttons[i].y+stackL+ledgeClearance)) + toolR),0,(wireTrackDepth)*-1,normalStep);//carve straight out from edge of button before heading to mcu
        
        F.plus("G01 Z2");
        F.plus("G00 F" + normalSpeed);
        
-       lineOptimized(((pedalManager.buttons[i].x+(pedalManager.buttons[i].stackW/2))) + 0,(((pedalManager.buttons[i].y-ledgeClearance)) + toolR)*invY,pedalManager.mcuCenter[0],pedalManager.mcuCenter[1]*invY,0,(wireTrackDepth)*-1,normalStep);//now carve to mcu pocket 
+       lineOptimized(((pedalManager.buttons[i].x+(pedalManager.buttons[i].stackW/2))),(((pedalManager.buttons[i].y+stackL+ledgeClearance)) + toolR),pedalManager.mcuCenter[0],pedalManager.mcuCenter[1],0,(wireTrackDepth)*-1,normalStep);//now carve to mcu pocket 
        
        F.plus("G01 Z2");
        F.plus("G00 F" + normalSpeed);
@@ -677,7 +678,7 @@ void exportGCode(){
       
       //general relief to leave a ledge
        for(float z = 0; z >= otherReliefDepth*-1; z -= normalStep){
-         rectangularFace((xOff+stackLedgeW) + 0, (yOff) + 0 , stackL -stackLedgeW,pedalManager.buttons[i].stackW,in,corner,z,toolR,stepover,normalSpeed );
+         rectangularFace(xOff+stackLedgeW, yOff, stackL-stackLedgeW,pedalManager.buttons[i].stackW,in,corner,z,toolR,stepover,normalSpeed );
        }
        
        F.plus("G01 Z2");
@@ -685,16 +686,16 @@ void exportGCode(){
        
        //foam slot
        for(float z = otherReliefDepth*-1; z >= (otherReliefDepth+4)*-1; z -= normalStep){
-         rectangularFace( pedalManager.buttons[i].foamSlotTL[1]+0-toolR +xOff,  pedalManager.buttons[i].foamSlotTL[0]+yOff, pedalManager.buttons[i].foamThickness,pedalManager.buttons[i].foamSlotWidth,in,corner,z,toolR,stepover,normalSpeed  );
+         rectangularFace( (-1*pedalManager.buttons[i].foamSlotBL[1]) +xOff +stackL,  pedalManager.buttons[i].foamSlotBL[0]+yOff, pedalManager.buttons[i].foamThickness,pedalManager.buttons[i].foamSlotWidth,in,corner,z,toolR,stepover,normalSpeed  );
        }
        
-       
+      
        F.plus("G01 Z2");
        F.plus("G00 F" + normalSpeed);
         
        //pcb holder
        for(float z = otherReliefDepth*-1; z >= buttonReliefDepth*-1; z -= normalStep){
-         rectangularFace(   ((pedalManager.buttons[i].buttonPCBTL[1]+xOff-actuatorPosOffset))+0,((pedalManager.buttons[i].buttonPCBTL[0]+yOff))+0,    buttonPCBDimension[1],buttonPCBDimension[0],in,corner,z,toolR,stepover,normalSpeed  );
+         rectangularFace(   ((pedalManager.buttons[i].buttonPCBBL[1]+xOff))+stackL-stackLedgeW,((pedalManager.buttons[i].buttonPCBBL[0]+yOff)),    buttonPCBDimension[1],buttonPCBDimension[0],in,corner,z,toolR,stepover,normalSpeed  );
        }
        
        F.plus("G01 Z2");
