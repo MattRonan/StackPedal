@@ -11,7 +11,7 @@ The result is a more compact pedal that wont get in your way.
 Why wood?  Wood is strong, looks nice, can be built quickly, and lends itself to a very straightforward editor interface. However a future TODO
 is to make a 3D printable version of this.
 
-The pedal shown in this readme uses an ESP32 (LOLIN32) which can be found on Amazon.  These are currently one of the cheapest boards that can act as an HID, costing as low as $6 if you buy them in packs of 4.  For a more compact pedal, Teensy LC can be used (for slightly more money), but due to the ongoing chip shortage getting one is difficult.  Teensy 4.0 is more available but costs about $20.  
+The pedal shown in this readme uses an ESP32 (LOLIN32) which can be found on Amazon.  These are currently one of the cheapest boards that can act as an HID, costing as low as $6 if you buy them in packs of 4.  
 
 # Build Instructions:
 
