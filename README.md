@@ -2,7 +2,9 @@
 
 ### A customizeable, cheap, open source mouse pedal. 
 
-StackPedal is a multi-level foot pedal designed for extremely easy control of an arbitrary amount of buttons, for under 20$.  It's ideal for activities that involve lots of clicking or scrolling, or with macros that are pressed frequently such as graphic design, CAD, copyediting, etc.  Provided are a Processing sketch which generates a design based on your parameters, and a basic Arduino sketch to let you dictate the messages your buttons will send.  The default sketch settings are for either a Teensy LC/3.2/4.0 or ESP32 as the microcontroller.  Many other microcontrollers can work.  Arduino Nano and any of the ubiquitous Nano clones WON'T work, because their usb hardware makes them unable to act as an HID (mouse). 
+![IMG_9024](https://github.com/user-attachments/assets/4c448f43-70c8-4bb8-ad23-462a9e9845b4)
+
+StackPedal is a multi-level foot pedal designed for extremely easy control of an arbitrary amount of buttons, for under 20$.  It's ideal for activities that involve lots of clicking or scrolling, or with macros that are pressed frequently.  Provided are a Processing sketch which generates a design based on your parameters, and a basic Arduino sketch to let you dictate the messages your buttons will send.  The default sketch settings are for either a Teensy LC/3.2/4.0 or ESP32 as the microcontroller.  Many other microcontrollers can work.  Arduino Nano and any of the ubiquitous Nano clones WON'T work, because their usb hardware makes them unable to act as an HID (mouse). 
 
 Why the stack?  By locating buttons at different levels, buttons can be closer together and still accurately pressed with a shoe on.
 The result is a more compact pedal that wont get in your way.
@@ -142,7 +144,7 @@ An example list of materials and their source, with base cost followed by approx
 - Foam sheet, 2mm thick, Michaels, $1, approx $0.50 per
 - #4 wood screws, Lowes, 2 x packs of 8: $3.00
 
-Total cost if you have to buy all of these things is $46.32.  But the per pedal cost is a maximum of $17.04, which goes down more if you buy a bigger pack of screws, a bigger sheet of plastic, etc.  I'm not including other odds and ends like wire, solder, adhesive, polyurethane, brushes etc.  
+Total cost if you have to buy all of these things is $46.32.  But the per pedal cost is a maximum of $17.04, which goes down more if you buy a bigger pack of screws, a bigger sheet of plastic, etc.  
 
 TODO LIST:
 -don't double cut mcu pockets.  
