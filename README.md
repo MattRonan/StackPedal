@@ -36,7 +36,7 @@ There are 2 ways to build the physical pedal.  Either export Gcode files from th
 
 First [download Processing](https://processing.org/download "Named link title") and open the StackPedalGenerator sketch.  At the top of the sketch is a section called **'USER VALUES'**.  There are 4 different subsections of variables to fiddle with:
 - **'CNC MACHINE RELATED'** If you are going to go the CNC route, make sure to set all these values so that they are correct for your machine, especially the first 4 which are marked with '**'.  Ignore these if routing by hand.
-- **'TEMPLATE SCALE RELATED'** This changes the on-screen scale of the pedal and consequently the scale of the PDF that you export.  Getting a perfectly scaled printout can take some trial and error.  It may be easiest to leave this at the default value and then fine tune the scale from the print dialog of your PDF viewer. 
+- **'TEMPLATE SCALE RELATED'** This changes the on-screen scale of the pedal and consequently the scale of the PDF that you export.  Getting a perfectly scaled printout can take some trial and error.  
 - **'UNIVERSAL DESIGN RELATED'** These give you control over the basic dimensions of the pedal.  You can change things like the location of the usb jack, length of the button stacks, overall depth of the pedal, etc.  You can probably leave most of these alone if you're unsure, but make sure the ones that begin with 'mcu' relfect the correct dimensions for your microcontroller.
 - **'PER BUTTON DESIGN RELATED'** These can be set indivudually for each button stack.
 
