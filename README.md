@@ -145,8 +145,3 @@ An example list of materials and their source, with base cost followed by approx
 - #4 wood screws, Lowes, 2 x packs of 8: $3.00
 
 Total cost if you have to buy all of these things is $46.32.  But the per pedal cost is a maximum of $17.04, which goes down more if you buy a bigger pack of screws, a bigger sheet of plastic, etc.  
-
-TODO LIST:
--don't double cut mcu pockets.  
--how can we export a pdf with the correct mm dimensions automatically, regardless of display size?
--real time pedal variable editing.  Would require saving to a txt file and pulling variables from there, instead of from the sketch.
