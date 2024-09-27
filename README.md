@@ -2,7 +2,12 @@
 
 ### A customizeable, cheap, open source mouse pedal. 
 
-StackPedal is ideal for activities that involve lots of clicking or scrolling, such as graphic design, CAD, video editing, and copyediting.  The cheapest available mouse pedals are typically around 50$ and bulky.  With StackPedal you can have a compact, lightweight design with however many buttons you need for under 20$ (see price notes at very bottom).  Provided are a Processing sketch which generates a design based on your parameters, and a basic Arduino sketch to let you dictate the messages your buttons will send.  The default sketch settings are for either a Teensy LC/3.2/4.0 or ESP32 as the microcontroller.  Many other microcontrollers can work.  One that you should specifically avoid is Arduino Nano and especially any of the ubiquitous Nano clones, because their usb hardware makes them unable to act as an HID (mouse). 
+StackPedal is a multi-level foot pedal designed for extremely easy control of an arbitrary amount of buttons, for under 20$.  It's ideal for activities that involve lots of clicking or scrolling, or with macros that are pressed frequently such as graphic design, CAD, copyediting, etc.  Provided are a Processing sketch which generates a design based on your parameters, and a basic Arduino sketch to let you dictate the messages your buttons will send.  The default sketch settings are for either a Teensy LC/3.2/4.0 or ESP32 as the microcontroller.  Many other microcontrollers can work.  Arduino Nano and any of the ubiquitous Nano clones WON'T work, because their usb hardware makes them unable to act as an HID (mouse). 
+
+Why the stack?  By locating buttons at different levels, buttons can be closer together and still accurately pressed with a shoe on.
+The result is a more compact pedal that wont get in your way.
+Why wood?  Wood is strong, looks nice, can be built quickly, and lends itself to a very straightforward editor interface. However a future TODO
+is to make a 3D printable version of this.
 
 The pedal shown in this readme uses an ESP32 (LOLIN32) which can be found on Amazon.  These are currently one of the cheapest boards that can act as an HID, costing as low as $6 if you buy them in packs of 4.  For a more compact pedal, Teensy LC can be used (for slightly more money), but due to the ongoing chip shortage getting one is difficult.  Teensy 4.0 is more available but costs about $20.  
 
