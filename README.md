@@ -4,7 +4,7 @@
 
 ![IMG_9024](https://github.com/user-attachments/assets/4c448f43-70c8-4bb8-ad23-462a9e9845b4)
 
-StackPedal is a multi-level foot pedal designed for extremely easy control of an arbitrary amount of buttons, for under 20$.  It's ideal for activities that involve lots of clicking or scrolling, or with macros that are pressed frequently.  Provided are a Processing sketch which generates a design based on your parameters, and a basic Arduino sketch to let you dictate the messages your buttons will send.  The default sketch settings are for either a Teensy LC/3.2/4.0 or ESP32 as the microcontroller.  Many other microcontrollers can work.  Arduino Nano and any of the ubiquitous Nano clones WON'T work, because their usb hardware makes them unable to act as an HID (mouse). 
+StackPedal is a multi-level foot pedal designed for extremely easy control of an arbitrary amount of buttons, for under 20$.  It's ideal for activities that involve lots of clicking or scrolling, or with macros that are pressed frequently.  Provided are a Processing sketch which generates a design based on your parameters and a basic Arduino sketch to let you dictate the messages your buttons will send.  The default sketch settings are for either a Teensy LC/3.2/4.0 or ESP32 as the microcontroller.  Many other microcontrollers can work.  Arduino Nano and any of the ubiquitous Nano clones WON'T work, because their usb hardware makes them unable to act as an HID (mouse). 
 
 Why the stack?  By locating buttons at different levels, buttons can be closer together and still accurately pressed with a shoe on.
 The result is a more compact pedal that wont get in your way.
